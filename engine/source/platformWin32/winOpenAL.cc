@@ -23,8 +23,8 @@
 #include "platformWin32/platformWin32.h"
 #include "console/console.h"
 
-#include "al/altypes.h"
-#include "al/alctypes.h"
+#include "al/al.h"
+#include "al/alc.h"
 #define INITGUID
 #include "al/eaxtypes.h"
 
@@ -63,7 +63,7 @@ static bool bindFunction( void *&fnAddress, const char *name )
 */
 static bool bindExtensionFunction( void *&fnAddress, const char *name )
 {
-   fnAddress = alGetProcAddress( (ALubyte*)name );
+   fnAddress = alGetProcAddress( (ALchar*)name );
    if( !fnAddress )
       Con::errorf(ConsoleLogEntry::General, " Missing OpenAL Extension function '%s'", name);
    return (fnAddress != NULL);

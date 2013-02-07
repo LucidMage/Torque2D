@@ -63,8 +63,8 @@ static ALCcontext *mContext = NULL;             // active OpenAL context
 static ALCdevice *mDevice   = NULL;             // active OpenAL device
 static ALCcontext *mContext = NULL;             // active OpenAL context
 #else
-static ALCvoid *mDevice   = NULL;             // active OpenAL device
-static ALCvoid *mContext = NULL;             // active OpenAL context
+static ALCdevice *mDevice   = NULL;             // active OpenAL device
+static ALCcontext *mContext = NULL;             // active OpenAL context
 #endif
 F32 mAudioChannelVolumes[Audio::AudioVolumeChannels];     // the attenuation for each of the channel types
 
@@ -2397,8 +2397,71 @@ void shutdownContext()
 }
 
 
+
+int getALDeviceCount()
+{
+	int num = 0;
+	auto devices = (char*)alcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER );
+
+	while(devices != NULL && devices[0] != '\0')
+	{
+		num++;
+		devices += dStrlen(devices) + 1;
+	}
+
+	return num;
+}
+
+char* getALDeviceName(int idx)
+{
+	int num = 0;
+	auto devices = (char*)alcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER );
+
+	while(devices != NULL && devices[0] != '\0')
+	{
+		if (num == idx)
+			return devices;
+
+		devices += dStrlen(devices) + 1;
+		num++;
+	}
+
+	return NULL;
+}
+
+int getALCaptureCount()
+{
+	int num = 0;
+	auto devices = (char*)alcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER);
+
+	while(devices != NULL && devices[0] != '\0')
+	{
+		num++;
+		devices += dStrlen(devices) + 1;
+	}
+
+	return num;
+}
+
+char* getALCaptureName(int idx)
+{
+	int num = 0;
+	auto devices = (char*)alcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER);
+
+	while(devices != NULL && devices[0] != '\0')
+	{
+		if (num == idx)
+			return devices;
+
+		devices += dStrlen(devices) + 1;
+		num++;
+	}
+
+	return NULL;
+}
+
 //--------------------------------------------------------------------------
-bool OpenALInit()
+bool OpenALInit(const char* dName)
 {
    OpenALShutdown();
 
@@ -2439,7 +2502,7 @@ bool OpenALInit()
 #elif defined(TORQUE_OS_OSX)
    mDevice = alcOpenDevice((const ALCchar*)NULL);
 #else
-   mDevice = (ALCvoid *)alcOpenDevice((const ALCchar*)NULL);
+   mDevice = (ALCdevice *)alcOpenDevice((const ALCchar*)dName);
 #endif
    if (mDevice == (ALCvoid *)NULL)
       return false;

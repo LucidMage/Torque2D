@@ -157,23 +157,26 @@ ConsoleFunctionGroupBegin(Audio, "Functions dealing with the OpenAL audio layer.
                           "@see www.OpenAL.org for what these functions do. Variances from posted"
                           "     behaviour is described below.");
 
-ConsoleFunction(OpenALInitDriver, bool, 1, 1, "() Use the OpenALInitDriver function to initialize the OpenAL driver.\n"
-                                                                "This must be done before all other OpenAL operations.\n"
-                                                                "@return Returns true on successful initialization, false otherwise.\n"
-                                                                "@sa OpenALShutdownDriver")
+ConsoleFunction(OpenALInitDriver, bool, 1, 2, "(<device_name>) Use the OpenALInitDriver function to initialize the OpenAL driver.\n"
+																"This must be done before all other OpenAL operations.\n"
+																"@return Returns true on successful initialization, false otherwise.\n"
+																"@sa OpenALShutdownDriver")
 {
-   if (Audio::OpenALInit())
+	const char *device = NULL;
+	if (argc == 2)
+		device = argv[1];
+   if (Audio::OpenALInit(device))
    {
       static bool registered = false;
       if (!registered) {
          ResourceManager->registerExtension(".wav", AudioBuffer::construct);
-      }
+		 ResourceManager->registerExtension(".ogg", AudioBuffer::construct);
+	  }
       registered = true;
       return true;
    }
    return false;
 }
-
 //-----------------------------------------------
 ConsoleFunction(OpenALShutdownDriver, void, 1, 1, "() Use the OpenALShutdownDriver function to stop/shut down the OpenAL driver.\n"
                                                                 "After this is called, you must restart the driver with OpenALInitDriver to execute any new sound operations.\n"
@@ -183,6 +186,29 @@ ConsoleFunction(OpenALShutdownDriver, void, 1, 1, "() Use the OpenALShutdownDriv
    Audio::OpenALShutdown();
 }
 
+
+ConsoleFunction(getALDeviceCount, int, 1, 1, "() Return the number of sound devices")
+{
+	return Audio::getALDeviceCount();
+}
+
+ConsoleFunction(getALDeviceName, const char*, 2, 2, "() Return the number of sound devices")
+{
+	int idx = dAtoi(argv[1]);
+	return Con::getReturnBuffer( Audio::getALDeviceName(idx) ) ;
+}
+
+
+ConsoleFunction(getALCaptureCount, int, 1, 1, "() Return the number of sound devices")
+{
+	return Audio::getALCaptureCount();
+}
+
+ConsoleFunction(getALCaptureName, const char*, 2, 2, "() Return the number of sound devices")
+{
+	int idx = dAtoi(argv[1]);
+	return Con::getReturnBuffer( Audio::getALCaptureName(idx) ) ;
+}
 
 //-----------------------------------------------
 ConsoleFunction(OpenALRegisterExtensions, void, 1, 1, "OpenALRegisterExtensions()"

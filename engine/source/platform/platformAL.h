@@ -36,12 +36,10 @@
 #include <OpenAL/alc.h>
 #else
 // declare externs of the AL fns here.
-#include "al/altypes.h"
-#include "al/alctypes.h"
+#include "al/al.h"
+#include "al/alc.h"
 #include "al/eaxtypes.h"
 #define AL_FUNCTION(fn_return,fn_name,fn_args, fn_value) extern fn_return (FN_CDECL *fn_name)fn_args;
-#include "al/al_func.h"
-#include "al/alc_func.h"
 #include "al/eax_func.h"
 #undef AL_FUNCTION
 #endif
@@ -57,8 +55,14 @@
 namespace Audio
 {
 
-bool OpenALInit();
+bool OpenALInit(const char* dName=NULL);
 void OpenALShutdown();
+
+int  getALDeviceCount();
+char* getALDeviceName(int idx);
+
+int  getALCaptureCount();
+char* getALCaptureName(int idx);
 
 bool OpenALDLLInit();
 void OpenALDLLShutdown();

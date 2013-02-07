@@ -2610,4 +2610,7 @@
   <ItemGroup>
     <ResourceCompile Include="Torque 2D.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\lib\openal\win32\al\OpenAL32.lib" />
+  </ItemGroup>
 </Project>
