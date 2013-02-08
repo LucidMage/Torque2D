@@ -66,7 +66,8 @@ bool RecordStreamSource::initStream() {
 	}
 	bBuffersAllocated = true;
 
-	auto capDevice = Con::getVariable("Game::DefaultCaptureDevice");
+	auto capDevice = Con::getVariable("pref::Audio::DefaultCaptureDevice");
+
 
 	mInputDevice = alcCaptureOpenDevice(capDevice,FREQ,AL_FORMAT_MONO16,CAP_SIZE*2);
 	if ((error = alGetError()) != AL_NO_ERROR) {
