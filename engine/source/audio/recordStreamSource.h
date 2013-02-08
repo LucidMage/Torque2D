@@ -48,7 +48,6 @@ private:
 	ALCdevice*				mInputDevice;
 
 	S32						mBufferIdx;
-	short*					mTempBuffer;
 
 	bool					bReady;
 	bool					bFinished;
@@ -65,6 +64,8 @@ private:
 	bool			bBuffersAllocated;
 
 	F32				mMicLevel;
+	F32				mPreviousThreshold;
+	SimTime			mThresholdHoldTime;
 
 	void clear();
 	void resetStream();
@@ -72,11 +73,16 @@ private:
 public:
 
 	std::list<unsigned char*> mHoldingBuffer;
+	std::list<unsigned char*> mThresholdBuffer;
 	std::list<unsigned char*> mSoundBuffer;
+
 	int mSoundBufferSize;
 	bool mMuted;
+	bool mEchoed;
 
 	F32  mRecordGain;
+	F32  mThreshold;
+
 };
 
 #endif // _RECORDSTREAMSOURCE_H_

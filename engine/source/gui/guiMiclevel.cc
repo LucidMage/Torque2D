@@ -15,9 +15,9 @@ IMPLEMENT_CONOBJECT(GuiMicLevel);
 GuiMicLevel::GuiMicLevel()
 {
 	mCurrentLevel  = 0.0f;
-	mSoundSetup	   = false;
 	mMicSound	   = NULL;
 	mAudioHandle   = NULL;
+	mEnabled	   = false;
 }
 
 void GuiMicLevel::initPersistFields()
@@ -32,13 +32,15 @@ void GuiMicLevel::onStaticModified(const char* slotName, const char*newValue /* 
 
 void GuiMicLevel::onPreRender()
 {
-	if (mMicSound == NULL) return;
+
+	if (mMicSound == NULL || !mEnabled) return;
 
 	RecordStreamSource* recordingSource = NULL;
 
 	if (!alxIsValidHandle(mAudioHandle))
 	{
 		mAudioHandle = alxCreateSource(mMicSound);
+		
 	}
 
 	alxPlay(mAudioHandle);
@@ -48,6 +50,7 @@ void GuiMicLevel::onPreRender()
 	if (NULL != recordingSource)
 	{
 		recordingSource->mMuted = false;
+		recordingSource->mEchoed = true;
 
 		mCurrentLevel = recordingSource->getMicLevel();
 	}
@@ -89,8 +92,19 @@ void GuiMicLevel::destroyMic()
 	}
 }
 
+void GuiMicLevel::toggleMic()
+{
+	mEnabled = !mEnabled;
+}
+
 
 ConsoleMethod( GuiMicLevel, destroyMic, void, 2, 2,  "")
 {
 	object->destroyMic();
+}
+
+
+ConsoleMethod( GuiMicLevel, toggleMic, void, 2, 2,  "")
+{
+	object->toggleMic();
 }

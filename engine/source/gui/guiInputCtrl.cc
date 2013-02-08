@@ -39,7 +39,7 @@ bool GuiInputCtrl::onWake()
    if ( !Parent::onWake() )
       return( false );
 
-   mouseLock();
+//   mouseLock();
    setFirstResponder();
 
    return( true );
@@ -50,7 +50,7 @@ bool GuiInputCtrl::onWake()
 void GuiInputCtrl::onSleep()
 {
    Parent::onSleep();
-   mouseUnlock();
+   //mouseUnlock();
    clearFirstResponder();
 }
 

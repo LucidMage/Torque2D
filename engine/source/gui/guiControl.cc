@@ -1562,6 +1562,12 @@ ConsoleMethod(GuiControl, setFirstResponder, void , 2, 2, "Sets this control as 
    object->setFirstResponder();
 }
 
+
+ConsoleMethod(GuiControl, clearFirstResponder, void , 2, 2, "")
+{
+	object->clearFirstResponder();
+}
+
 void GuiControl::clearFirstResponder()
 {
    GuiControl *parent = this;

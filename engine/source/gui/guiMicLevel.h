@@ -25,9 +25,11 @@ public:
 
 	void destroyMic();
 
+	void toggleMic();
+
 private:
 
-	bool mSoundSetup;
+	bool mEnabled;
 	F32 mCurrentLevel;
 	AssetPtr<AudioAsset>  mMicSound;
 	AUDIOHANDLE			  mAudioHandle;

@@ -13,7 +13,6 @@
 RecordStreamSource::RecordStreamSource()  {
 	mInputDevice = NULL;
 	mBufferIdx = 0;
-	mTempBuffer = NULL;
 	bIsValid = false;
 	mMuted = true;
 	bBuffersAllocated = false;
@@ -32,12 +31,14 @@ void RecordStreamSource::clear()
 {
 	mMuted			  = true;
 	mBufferIdx		  = 0;
-	mTempBuffer		  = NULL;
 	mInputDevice	  = NULL;
 	mHandle           = NULL_AUDIOHANDLE;
 	mSource			  = NULL;
 	mMicLevel		  = 0.0f;
+	mPreviousThreshold =0.0f;
 	mRecordGain		  = 1.0f;
+	mThreshold		  = 5.0f / 100.0f;
+	mThresholdHoldTime =0;
 
 	dMemset(&mDescription, 0, sizeof(Audio::Description));
 	mEnvironment = 0;
@@ -46,7 +47,7 @@ void RecordStreamSource::clear()
 	mPitch = 1.f;
 	mScore = 0.f;
 	mCullTime = 0;
-
+	mEchoed = false;
 	bReady = false;
 	bFinishedPlaying = false;
 	bIsValid = false;
@@ -122,10 +123,30 @@ bool RecordStreamSource::updateBuffers() {
 
 		mMicLevel = avg;
 
-		if (!mMuted)
+		std::list<unsigned char*>* bufferToUse = &mHoldingBuffer;
+
+		if (!mMuted && (mMicLevel > mThreshold || (Sim::getCurrentTime() - mThresholdHoldTime) < 400 )  )
 		{
-			//mHoldingBuffer.push_back((unsigned char*)Buffer);
-			mSoundBuffer.push_back((unsigned char*)Buffer);
+			if (mMicLevel > mThreshold)
+			{
+				mThresholdHoldTime = Sim::getCurrentTime();
+			}
+
+			while(mThresholdBuffer.size() > 0)
+			{
+				auto buffer = mThresholdBuffer.front();
+				bufferToUse->push_back(buffer);
+				mThresholdBuffer.pop_front();
+			}
+
+			bufferToUse->push_back((unsigned char*)Buffer);
+
+			if (mEchoed)
+			{
+				ALchar* EchoBuffer = new ALchar[CAP_SIZE*2];
+				memcpy(EchoBuffer, Buffer, CAP_SIZE*2);
+				mSoundBuffer.push_back((unsigned char*)EchoBuffer);
+			}
 
 			if (mHoldingBuffer.size() > 10)
 			{
@@ -134,10 +155,41 @@ bool RecordStreamSource::updateBuffers() {
 				mHoldingBuffer.pop_front();
 			}
 		}
+		else if (!mMuted && mMicLevel > mPreviousThreshold)
+		{
+			//we store a bit of time into a temp buffer so that if we do hit our threshold, we can slam the old data in first.
+			//this provides a better mic on experience.
+
+			mThresholdBuffer.push_back( (unsigned char*)Buffer);
+
+			if (mThresholdBuffer.size() > 5)
+			{
+				auto buf = mThresholdBuffer.front();
+				delete buf;
+				mThresholdBuffer.pop_front();
+			}
+		}
 		else
 		{
+			mThresholdHoldTime = 0;
+
+			while(bufferToUse->size() > 0)
+			{
+				auto buffer = bufferToUse->front();
+				bufferToUse->pop_front();
+			}
+
+
+			while(mThresholdBuffer.size() > 0)
+			{
+				auto buffer = mThresholdBuffer.front();
+				mThresholdBuffer.pop_front();
+			}
+
 			delete[] Buffer;
 		}
+
+		mPreviousThreshold = mMicLevel;
 
 	}
 
@@ -206,13 +258,29 @@ void RecordStreamSource::freeStream() {
 
 		mBufferQueue.clear();
 		bBuffersAllocated = false;
-
-		if (mTempBuffer)
-		{
-			delete[] mTempBuffer;
-			mTempBuffer = NULL;
-		}
 	}
+
+	while(mHoldingBuffer.size() > 0)
+	{
+		auto b = mHoldingBuffer.front();
+		delete b;
+		mHoldingBuffer.pop_front();
+	}
+
+	while(mSoundBuffer.size() > 0)
+	{
+		auto b = mSoundBuffer.front();
+		delete b;
+		mSoundBuffer.pop_front();
+	}
+
+	while(mThresholdBuffer.size() > 0)
+	{
+		auto b = mThresholdBuffer.front();
+		delete b;
+		mThresholdBuffer.pop_front();
+	}
+
 }
 
 void RecordStreamSource::resetStream() {
@@ -249,5 +317,31 @@ ConsoleFunction(setMicrophoneVolume, void, 3, 3, "(captureHandle, gain)")
 	if ( source )
 	{
 		source->mRecordGain = dAtof(argv[2]);
+	}
+}
+
+ConsoleFunction(SetMicrophoneThreshold, void, 3, 3, "(captureHandle, gain)")
+{
+	AUDIOHANDLE handle = dAtoi(argv[1]);
+	if(handle == NULL_AUDIOHANDLE)
+		return;
+
+	RecordStreamSource* source = (RecordStreamSource*)alxFindAudioStreamSource(handle);
+	if ( source )
+	{
+		source->mThreshold = dAtof(argv[2]);
+	}
+}
+
+ConsoleFunction(SetMicrophoneEcho, void, 3, 3, "(captureHandle, gain)")
+{
+	AUDIOHANDLE handle = dAtoi(argv[1]);
+	if(handle == NULL_AUDIOHANDLE)
+		return;
+
+	RecordStreamSource* source = (RecordStreamSource*)alxFindAudioStreamSource(handle);
+	if ( source )
+	{
+		source->mEchoed = dAtof(argv[2]);
 	}
 }
