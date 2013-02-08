@@ -607,7 +607,7 @@ iPhoneProfilerStart("SERVER_PROC");
 #ifndef NO_AUDIO_SUPPORT
 
     // Milliseconds between audio updates.
-    const U32 AudioUpdatePeriod = 125;
+    const U32 AudioUpdatePeriod = 20;
 
    // alxUpdate is somewhat expensive and does not need to be updated constantly,
    // though it does need to be updated in real time

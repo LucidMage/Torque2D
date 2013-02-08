@@ -30,12 +30,17 @@
 #include "audio/audioStreamSourceFactory.h"
 
 #include "audio/wavStreamSource.h"
+#include "audio/recordStreamSource.h"
 
 AudioStreamSource* AudioStreamSourceFactory::getNewInstance(const char *filename)
 {
 	S32 len = dStrlen(filename);
+
 	if(len > 3 && !dStricmp(filename + len - 4, ".wav"))
 		return new WavStreamSource(filename);
-	
+
+	if(len > 3 && !dStricmp(filename + len - 4, ".cap"))
+		return new RecordStreamSource();
+
 	return NULL;
 }

@@ -278,6 +278,7 @@
     <ClCompile Include="..\..\source\assets\declaredAssets.cc" />
     <ClCompile Include="..\..\source\assets\referencedAssets.cc" />
     <ClCompile Include="..\..\source\audio\AudioAsset.cc" />
+    <ClCompile Include="..\..\source\audio\recordStreamSource.cc" />
     <ClCompile Include="..\..\source\box2d\Collision\b2BroadPhase.cpp" />
     <ClCompile Include="..\..\source\box2d\Collision\b2CollideCircle.cpp" />
     <ClCompile Include="..\..\source\box2d\Collision\b2CollideEdge.cpp" />
@@ -374,6 +375,7 @@
     <ClCompile Include="..\..\source\gui\guiInputCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiListBoxCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiMessageVectorCtrl.cc" />
+    <ClCompile Include="..\..\source\gui\guiMiclevel.cc" />
     <ClCompile Include="..\..\source\gui\guiMLTextCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiMLTextEditCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiMouseEventCtrl.cc" />
@@ -690,6 +692,7 @@
     <ClInclude Include="..\..\source\assets\tamlAssetReferencedVisitor.h" />
     <ClInclude Include="..\..\source\assets\tamlAssetUpdateVisitor.h" />
     <ClInclude Include="..\..\source\audio\AudioAsset.h" />
+    <ClInclude Include="..\..\source\audio\recordStreamSource.h" />
     <ClInclude Include="..\..\source\box2d\Box2D.h" />
     <ClInclude Include="..\..\source\box2d\Collision\b2BroadPhase.h" />
     <ClInclude Include="..\..\source\box2d\Collision\b2Collision.h" />
@@ -805,6 +808,7 @@
     <ClInclude Include="..\..\source\gui\guiInputCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiListBoxCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiMessageVectorCtrl.h" />
+    <ClInclude Include="..\..\source\gui\guiMicLevel.h" />
     <ClInclude Include="..\..\source\gui\guiMLTextCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiMLTextEditCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiMouseEventCtrl.h" />
