@@ -125,6 +125,7 @@ void Room::LeaveRoom()
 	_Parent->LeaveRoom(this);
 	_chatServer->LeaveRoom(this);
 	Con::executef(this,2, "OnLeftRoom");
+	this->deleteObject();
 }
 
 void Room::DataResponse(Room* same, RakNet::RPC3 *rpcFromNetwork)
