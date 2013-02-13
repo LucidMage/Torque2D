@@ -99,7 +99,7 @@ void GuiWindowCtrl::PositionButtons(void)
    S32 buttonHeight = mBitmapBounds[BmpStates * BmpClose].extent.y;
    Point2I mainOff = mProfile->mTextOffset;
 
-   int minLeft = mBounds.extent.x - buttonWidth * 3 - mainOff.x;
+   int minLeft = (mBounds.extent.x-5) - buttonWidth * 3 - mainOff.x;
    int minTop = mainOff.y;
    int minOff = buttonWidth + 2;
    
@@ -639,11 +639,11 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    else if ( mProfile->mAlignment == GuiControlProfile::CenterJustify )
       start.set( ( winRect.extent.x - textWidth) / 2, 0 );
    else // GuiControlProfile::LeftJustify or garbage... ;)
-      start.set( 0, 0 );
+      start.set( 3, 0 );
    // If the text is longer then the box size, (it'll get clipped) so force Left Justify
    if( textWidth > winRect.extent.x ) start.set( 0, 0 );
    // center the vertical
-//   start.y = ( winRect.extent.y - ( font->getHeight() - 2 ) ) / 2;
+   start.y = ( mTitleHeight - ( mProfile->mFont->getHeight() - 2 ) ) / 2;
    dglDrawText(mFont, start + offset + mProfile->mTextOffset, mText);
 
    // deal with rendering the titlebar controls

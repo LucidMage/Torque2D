@@ -103,7 +103,7 @@ bool SimObject::registerObject()
 void SimObject::unregisterObject()
 {
     // Sanity!
-    AssertISV( getScriptCallbackGuard() == 0, "SimObject::unregisterObject: Object is being unregistered whilst performing a script callback!" );
+//    AssertISV( getScriptCallbackGuard() == 0, "SimObject::unregisterObject: Object is being unregistered whilst performing a script callback!" );
 
    mFlags.set(Removed);
 
@@ -133,7 +133,7 @@ void SimObject::unregisterObject()
 void SimObject::deleteObject()
 {
     // Sanity!
-    AssertISV( getScriptCallbackGuard() == 0, "SimObject::deleteObject: Object is being deleted whilst performing a script callback!" );
+    //AssertISV( getScriptCallbackGuard() == 0, "SimObject::deleteObject: Object is being deleted whilst performing a script callback!" );
 
     AssertFatal(mFlags.test(Added),
         "SimObject::deleteObject: Object not registered.");

@@ -63,6 +63,12 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Torque2D_DEBUG</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Torque2D</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">Torque2D</TargetName>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\Source;c:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\boost_1_52_0;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions\speex-1.1.12\include</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\Source;c:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\boost_1_52_0;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions\speex-1.1.12\include</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\Source;c:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\boost_1_52_0;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions\speex-1.1.12\include</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\boost_1_52_0\stage\lib;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\Lib</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\boost_1_52_0\stage\lib;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\Lib</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\boost_1_52_0\stage\lib;C:\Users\Bill\Documents\Visual Studio 2010\3rd party libraries\RakNet\Lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -73,9 +79,9 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../Lib/zlib;../../Lib/lpng;../../Lib/ljpeg;../../Lib/openal/win32;../../Source;../../source/testing/googleTest;../../source/testing/googleTest/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;_CRT_SECURE_NO_DEPRECATE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;_CRT_SECURE_NO_DEPRECATE;UNICODE;%(PreprocessorDefinitions);;HAVE_CONFIG_H</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
@@ -96,7 +102,7 @@
       <AdditionalIncludeDirectories>../../Lib/MSPlatformSDK/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;RPCRT4.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;unicows.lib;shell32.lib;shlwapi.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;RakNetLibStaticDebug.lib;COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;RPCRT4.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;unicows.lib;shell32.lib;shlwapi.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../../Torque2D_DEBUG.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>../../Lib/unicode;../../lib/MSPlatformSDK/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -120,7 +126,7 @@
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>../../Lib/zlib;../../Lib/lpng;../../Lib/ljpeg;../../Lib/openal/win32;../../Source;../../source/testing/googleTest;../../source/testing/googleTest/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions);HAVE_CONFIG_H</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -179,7 +185,7 @@
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>../../Lib/zlib;../../Lib/lpng;../../Lib/ljpeg;../../Lib/openal/win32;../../Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TORQUE_SHIPPING;UNICODE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TORQUE_SHIPPING;UNICODE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions);HAVE_CONFIG_H</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -232,6 +238,7 @@
     <ResourceCompile Include="Torque 2D.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions\RPC3\RPC3.cpp" />
     <ClCompile Include="..\..\source\2d\assets\AnimationAsset.cc" />
     <ClCompile Include="..\..\source\2d\assets\AnimationController.cc" />
     <ClCompile Include="..\..\source\2d\assets\ImageAsset.cc" />
@@ -341,6 +348,11 @@
     <ClCompile Include="..\..\source\debug\remote\RemoteDebuggerBridge.cc" />
     <ClCompile Include="..\..\source\debug\telnetDebugger.cc" />
     <ClCompile Include="..\..\source\delegates\delegateSignal.cpp" />
+    <ClCompile Include="..\..\source\EN\ClientSystem.cxx" />
+    <ClCompile Include="..\..\source\EN\Room.cxx" />
+    <ClCompile Include="..\..\source\EN\RoomManager.cxx" />
+    <ClCompile Include="..\..\source\EN\User.cxx" />
+    <ClCompile Include="..\..\source\EN\VOIP.cxx" />
     <ClCompile Include="..\..\source\game\defaultGame.cc" />
     <ClCompile Include="..\..\source\game\gameInterface.cc" />
     <ClCompile Include="..\..\source\graphics\bitmapBmp.cc" />
@@ -778,6 +790,11 @@
     <ClInclude Include="..\..\source\delegates\delegate.h" />
     <ClInclude Include="..\..\source\delegates\delegateSignal.h" />
     <ClInclude Include="..\..\source\delegates\FastDelegate.h" />
+    <ClInclude Include="..\..\source\EN\ClientSystem.hpp" />
+    <ClInclude Include="..\..\source\EN\Room.hpp" />
+    <ClInclude Include="..\..\source\EN\RoomManager.hpp" />
+    <ClInclude Include="..\..\source\EN\User.hpp" />
+    <ClInclude Include="..\..\source\EN\VOIP.hpp" />
     <ClInclude Include="..\..\source\game\defaultGame.h" />
     <ClInclude Include="..\..\source\game\gameInterface.h" />
     <ClInclude Include="..\..\source\game\gameInterface_ScriptBinding.h" />

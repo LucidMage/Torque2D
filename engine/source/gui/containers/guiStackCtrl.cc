@@ -1,23 +1,6 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
+// Torque Game Engine
+// Copyright (C) GarageGames.com, Inc.
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiStackCtrl.h"
@@ -26,23 +9,23 @@ IMPLEMENT_CONOBJECT(GuiStackControl);
 
 static EnumTable::Enums stackTypeEnum[] =
 {
-   { GuiStackControl::stackingTypeVert, "Vertical"  },
-   { GuiStackControl::stackingTypeHoriz,"Horizontal" },
-   { GuiStackControl::stackingTypeDyn,"Dynamic" }
+	{ GuiStackControl::stackingTypeVert, "Vertical"  },
+	{ GuiStackControl::stackingTypeHoriz,"Horizontal" },
+	{ GuiStackControl::stackingTypeDyn,"Dynamic" }
 };
 static EnumTable gStackTypeTable(3, &stackTypeEnum[0]);
 
 static EnumTable::Enums stackHorizEnum[] =
 {
-   { GuiStackControl::horizStackLeft, "Left to Right"  },
-   { GuiStackControl::horizStackRight,"Right to Left" }
+	{ GuiStackControl::horizStackLeft, "Left to Right"  },
+	{ GuiStackControl::horizStackRight,"Right to Left" }
 };
 static EnumTable gStackHorizSizingTable(2, &stackHorizEnum[0]);
 
 static EnumTable::Enums stackVertEnum[] =
 {
-   { GuiStackControl::vertStackTop, "Top to Bottom"  },
-   { GuiStackControl::vertStackBottom,"Bottom to Top" }
+	{ GuiStackControl::vertStackTop, "Top to Bottom"  },
+	{ GuiStackControl::vertStackBottom,"Bottom to Top" }
 };
 static EnumTable gStackVertSizingTable(2, &stackVertEnum[0]);
 
@@ -50,231 +33,271 @@ static EnumTable gStackVertSizingTable(2, &stackVertEnum[0]);
 
 GuiStackControl::GuiStackControl()
 {
-   mMinExtent.set(24, 24);
-   mResizing = false;
-   mStackingType = stackingTypeVert;
-   mStackVertSizing = vertStackTop;
-   mStackHorizSizing = horizStackLeft;
-   mPadding = 0;
-   mIsContainer = true;
+	mMinExtent.set(24, 24);
+	mResizing = false;
+	mStackingType = stackingTypeVert;
+	mStackVertSizing = vertStackTop;
+	mStackHorizSizing = horizStackLeft;
+	mPadding = 0;
+	mIsContainer = true;
 }
 
 void GuiStackControl::initPersistFields()
 {
 
-   addGroup( "Stacking" );
-   addField( "StackingType",       TypeEnum,         Offset(mStackingType, GuiStackControl), 1, &gStackTypeTable);
-   addField( "HorizStacking",       TypeEnum,         Offset(mStackHorizSizing, GuiStackControl), 1, &gStackHorizSizingTable);
-   addField( "VertStacking",        TypeEnum,         Offset(mStackVertSizing, GuiStackControl), 1, &gStackVertSizingTable);
-   addField( "Padding", TypeS32, Offset(mPadding, GuiStackControl));
-   endGroup( "Stacking" );
+	addGroup( "Stacking" );
+	addField( "StackingType",       TypeEnum,         Offset(mStackingType, GuiStackControl), 1, &gStackTypeTable);
+	addField( "HorizStacking",       TypeEnum,         Offset(mStackHorizSizing, GuiStackControl), 1, &gStackHorizSizingTable);
+	addField( "VertStacking",        TypeEnum,         Offset(mStackVertSizing, GuiStackControl), 1, &gStackVertSizingTable);
+	addField( "Padding", TypeS32, Offset(mPadding, GuiStackControl));
+	endGroup( "Stacking" );
 
-   Parent::initPersistFields();
+	Parent::initPersistFields();
 }
 
 ConsoleMethod( GuiStackControl, updateStack, void, 2, 2, "%stackCtrl.updateStack() - Restacks controls it owns")
 {
-   object->updatePanes();
+	object->updatePanes();
 }
 
 bool GuiStackControl::onWake()
 {
-   if ( !Parent::onWake() )
-      return false;
+	if ( !Parent::onWake() )
+		return false;
 
-   updatePanes();
+	updatePanes();
 
-   return true;
+	return true;
 }
 
 void GuiStackControl::onSleep()
 {
-   Parent::onSleep();
+	Parent::onSleep();
 }
 
 void GuiStackControl::updatePanes()
 {
-   // Prevent recursion
-   if(mResizing) 
-      return;
+	// Prevent recursion
+	if(mResizing) 
+		return;
 
-   // Set Resizing.
-   mResizing = true;
+	// Set Resizing.
+	mResizing = true;
 
-   Point2I extent = getExtent();
+	Point2I extent = getExtent();
 
-   // Do we need to stack horizontally?
-   if( ( extent.x > extent.y && mStackingType == stackingTypeDyn ) || mStackingType == stackingTypeHoriz )
-   {
-      switch( mStackHorizSizing )
-      {
-      case horizStackLeft:
-         stackFromLeft();
-         break;
-      case horizStackRight:
-         stackFromRight();
-         break;
-      }
-   }
-   // Or, vertically?
-   else if( ( extent.y > extent.x && mStackingType == stackingTypeDyn ) || mStackingType == stackingTypeVert)
-   {
-      switch( mStackVertSizing )
-      {
-      case vertStackTop:
-         stackFromTop();
-         break;
-      case vertStackBottom:
-         stackFromBottom();
+	// Do we need to stack horizontally?
+	if( ( extent.x > extent.y && mStackingType == stackingTypeDyn ) || mStackingType == stackingTypeHoriz )
+	{
+		switch( mStackHorizSizing )
+		{
+		case horizStackLeft:
+			stackFromLeft();
+			break;
+		case horizStackRight:
+			stackFromRight();
+			break;
+		}
+	}
+	// Or, vertically?
+	else if( ( extent.y > extent.x && mStackingType == stackingTypeDyn ) || mStackingType == stackingTypeVert)
+	{
+		switch( mStackVertSizing )
+		{
+		case vertStackTop:
+			stackFromTop();
+			break;
+		case vertStackBottom:
+			stackFromBottom();
 
-         break;
-      }
-   }
+			break;
+		}
+	}
 
-   // Clear Sizing Flag.
-   mResizing = false;
+	// Clear Sizing Flag.
+	mResizing = false;
 }
 
 void GuiStackControl::freeze(bool _shouldfreeze)
 {
-   mResizing = _shouldfreeze;
+	mResizing = _shouldfreeze;
 }
 
 void GuiStackControl::stackFromBottom()
 {
-   // Store the sum of the heights of our controls.
-   S32 totalHeight=0;
+	// Store the sum of the heights of our controls.
+	S32 totalHeight=0;
 
-   Point2I curPos;
-   // If we go from the bottom, things are basically the same...
-   // except we have to assign positions in an arse backwards way
-   // (literally :P)
+	Point2I curPos;
+	// If we go from the bottom, things are basically the same...
+	// except we have to assign positions in an arse backwards way
+	// (literally :P)
 
-   // Figure out how high everything is going to be...
-   // Place each child...
-   for( S32 i = 0; i < size(); i++ )
-   {
-      // Place control
-      GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
+	// Figure out how high everything is going to be...
+	// Place each child...
+	for( S32 i = 0; i < size(); i++ )
+	{
+		// Place control
+		GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
 
-      if(gc && gc->isVisible() )
-      {
-         Point2I childExtent = gc->getExtent();
-         totalHeight += childExtent.y;
-      }
-   }
+		if(gc && gc->isVisible() )
+		{
+			Point2I childExtent = gc->getExtent();
+			totalHeight += childExtent.y;
+		}
+	}
 
-   // Figure out where we're starting...
-   curPos = getPosition();
-   curPos.y += totalHeight;
+	// Figure out where we're starting...
+	curPos = getPosition();
+	curPos.y += totalHeight;
 
-   // Offset so the bottom control goes in the right place...
-   GuiControl * gc = dynamic_cast<GuiControl*>(operator [](size()-1));
-   if(gc)
-      curPos.y -= gc->getExtent().y;
+	// Offset so the bottom control goes in the right place...
+	GuiControl * gc = dynamic_cast<GuiControl*>(operator [](size()-1));
+	if(gc)
+		curPos.y -= gc->getExtent().y;
 
 
-   // Now work up from there!
-   for(S32 i=size()-1; i>=0; i--)
-   {
-      // Place control
-      GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
+	// Now work up from there!
+	for(S32 i=size()-1; i>=0; i--)
+	{
+		// Place control
+		GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
 
-      if(gc)
-      {
-         // We must place the child...
+		if(gc)
+		{
+			// We must place the child...
 
-         // Make it have our width but keep its height
-         Point2I childExtent = gc->getExtent();
+			// Make it have our width but keep its height
+			Point2I childExtent = gc->getExtent();
 
-         // Update our state...
-         curPos.y -= childExtent.y - mPadding;
+			// Update our state...
+			curPos.y -= childExtent.y - mPadding;
 
-         // And resize...
-         gc->resize(curPos - getPosition(), Point2I(getExtent().x, childExtent.y));
-      }
-   }
+			// And resize...
+			gc->resize(curPos - getPosition(), Point2I(getExtent().x, childExtent.y));
+		}
+	}
 }
 void GuiStackControl::stackFromTop()
 {
-   // Store the sum of the heights of our controls.
-   S32 totalHeight=0;
+	// Store the sum of the heights of our controls.
+	S32 totalHeight=0;
 
-   Point2I curPos;
-   // Position and resize everything...
-   curPos = getPosition();
+	Point2I curPos;
+	// Position and resize everything...
+	curPos = getPosition();
 
-   // Place each child...
-   for(S32 i=0; i<size(); i++)
-   {
-      // Place control
-      GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
+	// Place each child...
+	for(S32 i=0; i<size(); i++)
+	{
+		// Place control
+		GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
 
-      if(gc && gc->isVisible() )
-      {
-         // We must place the child...
+		if(gc && gc->isVisible() )
+		{
+			// We must place the child...
 
-         // Make it have our width but keep its height
-         Point2I childExtent = gc->getExtent();
+			// Make it have our width but keep its height
+			Point2I childExtent = gc->getExtent();
 
-         gc->resize(curPos - getPosition(), Point2I(getExtent().x, childExtent.y));
+			gc->resize(curPos - getPosition(), Point2I(getExtent().x, childExtent.y));
 
-         // Update our state...
-         curPos.y    += childExtent.y + mPadding;
-         totalHeight += childExtent.y + mPadding;
-      }
-   }
-   // Conform our size to the sum of the child sizes.
-   if( totalHeight > getExtent().y )
-   {
-      curPos.x = getExtent().x;
-      curPos.y = totalHeight;
-      resize(getPosition(), curPos);
-   }
-   else if( totalHeight < getExtent().y )
-   {
-      curPos.x = getExtent().x;
-      curPos.y = getMax( totalHeight , mMinExtent.y );
-      resize(getPosition(), curPos);
-   }
+			// Update our state...
+			curPos.y    += childExtent.y + mPadding;
+			totalHeight += childExtent.y + mPadding;
+		}
+	}
+	// Conform our size to the sum of the child sizes.
+	if( totalHeight > getExtent().y )
+	{
+		curPos.x = getExtent().x;
+		curPos.y = totalHeight;
+		resize(getPosition(), curPos);
+	}
+	else if( totalHeight < getExtent().y )
+	{
+		curPos.x = getExtent().x;
+		curPos.y = getMax( totalHeight , mMinExtent.y );
+		resize(getPosition(), curPos);
+	}
 }
 void GuiStackControl::stackFromLeft()
 {
-   // Store the sum of the heights of our controls.
-   S32 totalWidth=0;
+	// Store the sum of the heights of our controls.
+	S32 totalWidth=0;
+	S32 totalControlWidth =0;
+	Point2I curPos;
+	// Position and resize everything...
+	curPos = getPosition();
 
-   Point2I curPos;
-   // Position and resize everything...
-   curPos = getPosition();
 
-   // Place each child...
-   for(S32 i=0; i<size(); i++)
-   {
-      // Place control
-      GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
+	//first lets see if we even have room to fit all the controls. If not, we will need to resize everything.
+	for(S32 i=0; i<size(); i++)
+	{
+		GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
 
-      if(gc && gc->isVisible() )
-      {
-         // We must place the child...
+		if(gc && gc->isVisible() )
+		{
+			Point2I childExtent = (*(htControlSize.find(gc))).value;
+			Point2I childExtentMin = (*(htControlSizeMin.find(gc))).value;
 
-         // Make it have our width but keep its height
-         Point2I childExtent = gc->getExtent();
+			totalWidth += childExtent.x + mPadding;
+		}
+	}
 
-         gc->resize(curPos - getPosition(), Point2I( childExtent.x,getExtent().y));
+	F64 adjustFactor = 0;
+	if (totalWidth > getExtent().x)
+	{
+		//what factor are we off by.
+		adjustFactor = (F64)getExtent().x / (F64)totalWidth;
+	}
+	totalControlWidth = totalWidth;
+	totalWidth = 0;
+	// Place each child...
+	int totalSize = size();
+	for(S32 i=0; i<totalSize; i++)
+	{
+		// Place control
+		GuiControl * gc = dynamic_cast<GuiControl*>(operator [](i));
 
-         // Update our state...
-         curPos.x    += childExtent.x + mPadding;
-         totalWidth += childExtent.x + mPadding;
-      }
-   }
+		if(gc && gc->isVisible() )
+		{
+			// We must place the child...
 
-   // Conform our size to the sum of the child sizes.
-   if( totalWidth > getExtent().x )
-   {
-      curPos.x = totalWidth;
-      curPos.y = getExtent().y;
-      resize(getPosition(), curPos);
-   }
+			// Make it have our width but keep its height
+			Point2I childExtent = (*(htControlSize.find(gc))).value;
+
+			S32 newChildExtent = childExtent.x;
+			//if there is an adjustment factor, we have to adjust the child control width.
+			if (adjustFactor > 0.0)
+			{
+				newChildExtent *= adjustFactor;
+			}
+
+			gc->resize(curPos - getPosition(), Point2I( newChildExtent,childExtent.y));
+
+			childExtent = gc->getExtent();
+			if (childExtent.x > newChildExtent)
+			{
+				//hit a min extent, so we have to adjust all the other controls to compensate.
+				auto diff = childExtent.x - newChildExtent;
+				F64 fDif = (F64)diff / (F64)totalControlWidth;
+				adjustFactor -= fDif;
+			}
+
+			// Update our state...
+			curPos.x    += childExtent.x + mPadding;
+			totalWidth += childExtent.x + mPadding;
+		}
+	}
+
+	// Conform our size to the sum of the child sizes.
+	//    if( totalWidth > getExtent().x )
+	//    {
+	//       curPos.x = totalWidth;
+	//       curPos.y = getExtent().y;
+	//       resize(getPosition(), curPos);
+	//    }
 }
 void GuiStackControl::stackFromRight()
 {
@@ -282,44 +305,61 @@ void GuiStackControl::stackFromRight()
 
 void GuiStackControl::resize(const Point2I &newPosition, const Point2I &newExtent)
 {
-   //call set update both before and after
-   setUpdate();
-   Point2I actualNewExtent = Point2I(  getMax(mMinExtent.x, newExtent.x),
-                                       getMax(mMinExtent.y, newExtent.y));
-   mBounds.set(newPosition, actualNewExtent);
+	//call set update both before and after
+	setUpdate();
+	Point2I actualNewExtent = Point2I(  getMax(mMinExtent.x, newExtent.x),
+		getMax(mMinExtent.y, newExtent.y));
+	mBounds.set(newPosition, actualNewExtent);
 
-   GuiControl *parent = getParent();
-   if (parent)
-      parent->childResized(this);
-   setUpdate();
+	GuiControl *parent = getParent();
+	if (parent)
+		parent->childResized(this);
+	setUpdate();
 
-   updatePanes();
+	updatePanes();
 }
 
 void GuiStackControl::addObject(SimObject *obj)
 {
-   Parent::addObject(obj);
+	Parent::addObject(obj);
 
-   updatePanes();
+	GuiControl *ctrl = dynamic_cast<GuiControl *>(obj);
+	if(ctrl)
+	{
+		htControlSize.insertUnique(ctrl, ctrl->getExtent());
+		htControlSizeMin.insertUnique(ctrl, ctrl->getMinExtent());
+	}
+
+	updatePanes();
 }
 
 void GuiStackControl::removeObject(SimObject *obj)
 {
-   Parent::removeObject(obj);
+	Parent::removeObject(obj);
 
-   updatePanes();
+	GuiControl *ctrl = dynamic_cast<GuiControl *>(obj);
+	if(ctrl)
+	{
+		htControlSize.erase(ctrl);
+		htControlSizeMin.erase(ctrl);
+	}
+
+
+	updatePanes();
 }
 
 bool GuiStackControl::reOrder(SimObject* obj, SimObject* target)
 {
-   bool ret = Parent::reOrder(obj, target);
-   if (ret)
-      updatePanes();
+	bool ret = Parent::reOrder(obj, target);
+	if (ret)
+	{
+		updatePanes();
+	}
 
-   return ret;
+	return ret;
 }
 
 void GuiStackControl::childResized(GuiControl *child)
 {
-   updatePanes();
+	updatePanes();
 }

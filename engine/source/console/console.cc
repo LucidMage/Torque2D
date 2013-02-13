@@ -1062,14 +1062,14 @@ const char *execute(SimObject *object, S32 argc, const char *argv[],bool thisCal
       dSprintf(idBuf, sizeof(idBuf), "%d", object->getId());
       argv[1] = idBuf;
 
-      object->pushScriptCallbackGuard();
+     // object->pushScriptCallbackGuard();
 
       SimObject *save = gEvalState.thisObject;
       gEvalState.thisObject = object;
       const char *ret = ent->execute(argc, argv, &gEvalState);
       gEvalState.thisObject = save;
 
-      object->popScriptCallbackGuard();
+      //object->popScriptCallbackGuard();
 
       // Twiddle it back
       argv[1] = oldArg1;

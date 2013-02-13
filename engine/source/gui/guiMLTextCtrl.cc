@@ -463,10 +463,10 @@ void GuiMLTextCtrl::addText(const char* textBuffer, const U32 numChars, bool ref
    //after setting text, always set the cursor to the beginning
    if (reformat)
    {
-      setCursorPosition(0);
-      clearSelection();
+//      setCursorPosition(0);
+//      clearSelection();
       mDirty = true;
-      scrollToTop();
+//      scrollToTop();
    }
 }
 
@@ -1935,7 +1935,7 @@ textemit:
    Con::executef( this, 3, "onResize", Con::getIntArg( mBounds.extent.x ), Con::getIntArg( mMaxY ) );
 
    //make sure the cursor is still visible - this handles if we're a child of a scroll ctrl...
-   ensureCursorOnScreen();
+   //ensureCursorOnScreen();
 }
 
 //-----------------------------------------------------------------------------
