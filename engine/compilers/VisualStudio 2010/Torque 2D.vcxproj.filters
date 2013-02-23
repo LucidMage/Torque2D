@@ -166,12 +166,6 @@
     <Filter Include="testing\tests">
       <UniqueIdentifier>{57e1271d-4358-4180-b168-4b9c2cbac907}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EN">
-      <UniqueIdentifier>{163318dc-ad8f-416b-b277-ebe0eb548b33}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="EN\RPC">
-      <UniqueIdentifier>{400fa198-0bc7-4964-9888-98d508b6b084}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -1284,23 +1278,11 @@
     <ClCompile Include="..\..\source\gui\guiMiclevel.cc">
       <Filter>gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\EN\ClientSystem.cxx">
-      <Filter>EN</Filter>
+    <ClCompile Include="..\..\source\2d\assets\TmxMapAsset.cc">
+      <Filter>2d\assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\EN\Room.cxx">
-      <Filter>EN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\EN\RoomManager.cxx">
-      <Filter>EN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\EN\User.cxx">
-      <Filter>EN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\EN\VOIP.cxx">
-      <Filter>EN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Visual Studio 2010\3rd party libraries\RakNet\DependentExtensions\RPC3\RPC3.cpp">
-      <Filter>EN\RPC</Filter>
+    <ClCompile Include="..\..\source\2d\sceneobject\TmxMapSprite.cpp">
+      <Filter>2d\sceneobject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2628,20 +2610,14 @@
     <ClInclude Include="..\..\source\gui\guiMicLevel.h">
       <Filter>gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\EN\ClientSystem.hpp">
-      <Filter>EN</Filter>
+    <ClInclude Include="..\..\source\2d\assets\TmxMapAsset.h">
+      <Filter>2d\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\EN\Room.hpp">
-      <Filter>EN</Filter>
+    <ClInclude Include="..\..\source\2d\assets\TmxMapAsset_ScriptBinding.h">
+      <Filter>2d\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\EN\RoomManager.hpp">
-      <Filter>EN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\EN\User.hpp">
-      <Filter>EN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\EN\VOIP.hpp">
-      <Filter>EN</Filter>
+    <ClInclude Include="..\..\source\2d\sceneobject\TmxMapSprite.h">
+      <Filter>2d\sceneobject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

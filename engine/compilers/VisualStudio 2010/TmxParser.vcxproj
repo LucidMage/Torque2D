@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{798FC53D-6DA5-4634-8C4E-1CA2368F27EA}</ProjectGuid>
+    <RootNamespace>TmxParser</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\../../Link/Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\../../Link/Debug/tmxparser\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\../../Link/Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\../../Link/Release/tmxparser\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_DEBUG</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)zlib;$(ProjectDir)tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NULL=0;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)zlib;$(ProjectDir)tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NULL=0;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>.\../../Link/Release\tmxparser.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\lib\TmxParser\base64\base64.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxEllipse.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxImage.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxImageLayer.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxLayer.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxMap.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxObject.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxObjectGroup.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxPolygon.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxPolyline.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxPropertySet.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxTile.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxTileset.cpp" />
+    <ClCompile Include="..\..\lib\TmxParser\TmxUtil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\lib\TmxParser\base64\base64.h" />
+    <ClInclude Include="..\..\lib\TmxParser\tinyxml\tinystr.h" />
+    <ClInclude Include="..\..\lib\TmxParser\tinyxml\tinyxml.h" />
+    <ClInclude Include="..\..\lib\TmxParser\Tmx.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxEllipse.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxImage.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxImageLayer.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxLayer.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxMap.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxMapTile.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxObject.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxObjectGroup.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxPoint.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxPolygon.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxPolyline.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxPropertySet.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxTile.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxTileset.h" />
+    <ClInclude Include="..\..\lib\TmxParser\TmxUtil.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
