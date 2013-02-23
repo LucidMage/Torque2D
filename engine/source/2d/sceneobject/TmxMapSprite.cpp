@@ -98,6 +98,8 @@ void TmxMapSprite::BuildMap()
 	ClearMap();
 	auto mapParser = mMapAsset->getParser();
 
+	Tmx::MapOrientation orient = mapParser->GetOrientation();
+
 	F32 tileWidth = mapParser->GetTileWidth();
 	F32 tileHeight =mapParser->GetTileHeight();
 	F32 halfTileHeight = tileHeight * 0.5;
@@ -105,13 +107,23 @@ void TmxMapSprite::BuildMap()
 	F32 width = (mapParser->GetWidth() * tileWidth);
 	F32 height = (mapParser->GetHeight() * tileHeight);
 
-	F32 originY = height / 2 - halfTileHeight;
+	F32 originY = 0;
 	F32 originX = 0;
+
+	if (orient == Tmx::TMX_MO_ISOMETRIC)
+	{
+		originY = height / 2 - halfTileHeight;
+	}
+	else
+	{
+		originX = -width/2;
+		originY = -height/2; 
+	}
+
 
 	Vector2 tileSize(tileWidth, tileHeight);
 	Vector2 originSize(originX, originY);
 
-	Tmx::MapOrientation orient = mapParser->GetOrientation();
 
 	auto layerItr = mapParser->GetLayers().begin();
 	for(layerItr; layerItr != mapParser->GetLayers().end(); ++layerItr)
@@ -146,8 +158,12 @@ void TmxMapSprite::BuildMap()
 				F32 heightOffset = (spriteHeight - tileHeight) / 2;
 				F32 widthOffset = (spriteWidth - tileWidth) / 2;
 
+				//for some reason TMX stores orth y offsets reversed...
+				int yTile = y;
+				if (orient != Tmx::TMX_MO_ISOMETRIC)
+					yTile = yTiles -y;
 
-				Vector2 pos = TileToCoord( Vector2(x,y),
+				Vector2 pos = TileToCoord( Vector2(x,yTile),
 					tileSize,
 					originSize,
 					orient == Tmx::TMX_MO_ISOMETRIC
@@ -257,7 +273,12 @@ Vector2 TmxMapSprite::TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offs
 	}
 	else
 	{
-		return pos;
+		Vector2 newPos(
+			offset.x + (pos.x * tileSize.x),
+			offset.y + (pos.y * tileSize.y)
+			);
+
+		return newPos;
 	}
 }
 
