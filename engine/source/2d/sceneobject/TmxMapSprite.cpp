@@ -13,6 +13,7 @@ TmxMapSprite::TmxMapSprite() : mMapPixelToMeterFactor(0.03),
 	mLastTileImage(StringTable->EmptyString)
 {
 	mAutoSizing = true;
+	setSleepingAllowed(true);
 	setBodyType(b2_staticBody);
 }
 
@@ -74,7 +75,16 @@ void TmxMapSprite::setPosition( const Vector2& position )
 	{
 		(*layerIdx)->setPosition(position);
 	}
+}
 
+void TmxMapSprite::setAngle( const F32 radians )
+{
+	Parent::setAngle(radians);
+	auto layerIdx = mLayers.begin();
+	for(layerIdx; layerIdx != mLayers.end(); ++layerIdx)
+	{
+		(*layerIdx)->setAngle(radians);
+	}
 }
 
 void TmxMapSprite::ClearMap()
@@ -117,7 +127,7 @@ void TmxMapSprite::BuildMap()
 	else
 	{
 		originX = -width/2;
-		originY = -height/2; 
+		originY = height/2; 
 	}
 
 
@@ -158,12 +168,7 @@ void TmxMapSprite::BuildMap()
 				F32 heightOffset = (spriteHeight - tileHeight) / 2;
 				F32 widthOffset = (spriteWidth - tileWidth) / 2;
 
-				//for some reason TMX stores orth y offsets reversed...
-				int yTile = y;
-				if (orient != Tmx::TMX_MO_ISOMETRIC)
-					yTile = yTiles -y;
-
-				Vector2 pos = TileToCoord( Vector2(x,yTile),
+				Vector2 pos = TileToCoord( Vector2(x,y),
 					tileSize,
 					originSize,
 					orient == Tmx::TMX_MO_ISOMETRIC
@@ -218,7 +223,12 @@ void TmxMapSprite::BuildMap()
 				orient == Tmx::TMX_MO_ISOMETRIC
 				);
 
-			vTile.sub(Vector2(1,1)); // objects need to be offset by 1 (not sure why right now).
+			//TODO: I need to do more testing around object tile map positions. iso seem to be offset by -1,-1 tiles, while orth is 0,-1. 
+			//Not sure if it's related to the object tile size compared to the map size, etc.
+			if (orient == Tmx::TMX_MO_ISOMETRIC)
+				vTile.sub(Vector2(1,1));
+			else
+				vTile.sub(Vector2(0,1));
 
 			Vector2 pos = TileToCoord( vTile,
 				tileSize,
@@ -256,8 +266,12 @@ Vector2 TmxMapSprite::CoordToTile(Vector2& pos, Vector2& tileSize, bool isIso)
 	}
 	else
 	{
-		return pos;
-	}
+		Vector2 newPos(
+			pos.x / tileSize.x,
+			pos.y / tileSize.y
+			);
+
+		return newPos;	}
 }
 
 Vector2 TmxMapSprite::TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offset, bool isIso)
@@ -275,7 +289,7 @@ Vector2 TmxMapSprite::TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offs
 	{
 		Vector2 newPos(
 			offset.x + (pos.x * tileSize.x),
-			offset.y + (pos.y * tileSize.y)
+			offset.y - (pos.y * tileSize.y)
 			);
 
 		return newPos;
@@ -294,10 +308,10 @@ CompositeSprite* TmxMapSprite::CreateLayer(int layerIndex, bool isIso)
 
 	compSprite->setBatchLayout( CompositeSprite::NO_LAYOUT );
 	compSprite->setPosition(getPosition());
+	compSprite->setAngle(getAngle());
 	compSprite->setSceneLayer(layerIndex);
 	compSprite->setBatchSortMode(SceneRenderQueue::RENDER_SORT_ZAXIS);
 	compSprite->setBatchIsolated(true);
-
 	return compSprite;
 }
 

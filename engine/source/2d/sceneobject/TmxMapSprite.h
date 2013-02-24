@@ -29,6 +29,7 @@ public:
 	virtual void OnRegisterScene(Scene* scene);
 	virtual void OnUnregisterScene( Scene* pScene );
 	virtual void            setPosition( const Vector2& position );
+	virtual void			setAngle( const F32 radians );
 
 	/// Declare Console Object.
 	DECLARE_CONOBJECT( TmxMapSprite );
