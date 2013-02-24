@@ -982,7 +982,7 @@ ConsoleMethod(SceneObject, getContact, const char*, 3, 3,    "(contactIndex) Get
     }
 
     // Fetch contacts.
-    const typeContactVector* pCurrentContacts = object->getCurrentContacts();
+    const Scene::typeContactVector* pCurrentContacts = object->getCurrentContacts();
 
     // Sanity!
     AssertFatal( pCurrentContacts != NULL, "SceneObject::getContact() - Contacts not initialized correctly." );
@@ -1617,7 +1617,7 @@ ConsoleMethod(SceneObject, getAngularDamping, F32, 2, 2, "() - Gets the angular 
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(SceneObject, moveTo, bool, 4, 7,  "(worldPoint X/Y, time, [autoStop = true], [warpToTarget = true]) - Moves the object to the specified world point.\n"
+ConsoleMethod(SceneObject, moveTo, bool, 4, 7,  "(worldPoint X/Y, speed, [autoStop = true], [warpToTarget = true]) - Moves the object to the specified world point.\n"
                                                 "The point is moved by calculating the initial linear velocity required and applies it.\n"
                                                 "The object may never reach the point if it has linear damping applied or collides with another object.\n"
                                                 "@param worldPoint/Y The world point to move the object to.\n"
