@@ -1,5 +1,7 @@
 #include "TmxMapAsset.h"
 
+#include "2d/scene/SceneRenderQueue.h"
+
 // Debug Profiling.
 #include "debug/profiler.h"
 
@@ -54,6 +56,14 @@ IMPLEMENT_CONOBJECT(TmxMapAsset);
 
 //------------------------------------------------------------------------------
 
+/// Custom map taml configuration
+static bool explicitCellPropertiesInitialized = false;
+
+static StringTableEntry			layerCustomPropertyName;
+static StringTableEntry			layerAliasName;
+static StringTableEntry			layerIdName;
+static StringTableEntry			layerIndexName;
+
 
 //------------------------------------------------------------------------------
 
@@ -61,6 +71,15 @@ TmxMapAsset::TmxMapAsset() :  mMapFile(StringTable->EmptyString),
 	mParser(NULL)
 
 {
+	if (!explicitCellPropertiesInitialized)
+	{
+		layerCustomPropertyName = StringTable->insert("Layers");
+		layerAliasName = StringTable->insert("Layer");
+		layerIdName = StringTable->insert("Name");
+		layerIndexName = StringTable->insert("Layer");
+
+		explicitCellPropertiesInitialized = true;
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -175,6 +194,105 @@ void TmxMapAsset::onTamlPostWrite( void )
 	mMapFile = expandAssetFilePath( mMapFile );
 }
 
+//-----------------------------------------------------------------------------
+
+void TmxMapAsset::onTamlCustomRead( const TamlCustomProperties& customProperties )
+{
+	// Debug Profiling.
+	PROFILE_SCOPE(TmxMapAsset_OnTamlCustomRead);
+
+	// Call parent.
+	Parent::onTamlCustomRead( customProperties );
+
+	// Find cell custom property
+	const TamlCustomProperty* pLayerProperty = customProperties.findProperty( layerCustomPropertyName );
+
+	if ( pLayerProperty != NULL )
+	{
+		for( TamlCustomProperty::const_iterator propertyAliasItr = pLayerProperty->begin(); propertyAliasItr != pLayerProperty->end(); ++propertyAliasItr )
+		{
+			// Fetch property alias.
+			TamlPropertyAlias* pPropertyAlias = *propertyAliasItr;
+
+			// Fetch alias name.
+			StringTableEntry aliasName = pPropertyAlias->mAliasName;
+
+			if (aliasName != layerAliasName)
+			{
+				// No, so warn.
+				Con::warnf( "TmxMapAsset::onTamlCustomRead() - Encountered an unknown custom alias name of '%s'.  Only '%s' is valid.", aliasName, layerAliasName );
+				continue;
+			}
+
+
+			S32 layerNumber = 0;
+			StringTableEntry tmxLayerName = StringTable->EmptyString;
+
+			// Iterate property fields.
+			for ( TamlPropertyAlias::const_iterator propertyFieldItr = pPropertyAlias->begin(); propertyFieldItr != pPropertyAlias->end(); ++propertyFieldItr )
+			{
+				// Fetch property field.
+				TamlPropertyField* pPropertyField = *propertyFieldItr;
+
+				// Fetch property field name.
+				StringTableEntry fieldName = pPropertyField->getFieldName();
+
+				if (fieldName == layerIdName)
+				{
+					tmxLayerName = StringTable->insert( pPropertyField->getFieldValue() );
+				}
+				else if (fieldName == layerIndexName)
+				{
+					pPropertyField->getFieldValue( layerNumber );
+				}
+				else
+				{
+					// Unknown name so warn.
+					Con::warnf( "TmxMapAsset::onTamlCustomRead() - Encountered an unknown custom field name of '%s'.", fieldName );
+					continue;
+				}
+			}
+
+			LayerOverride lo(tmxLayerName, layerNumber);
+
+			mLayerOverrides.push_back(lo);
+
+		}
+	}
+}
+//-----------------------------------------------------------------------------
+
+void TmxMapAsset::onTamlCustomWrite( TamlCustomProperties& customProperties )
+{
+	// Debug Profiling.
+	PROFILE_SCOPE(TmxMapAsset_OnTamlCustomWrite);
+
+	// Call parent.
+	Parent::onTamlCustomWrite( customProperties );
+
+	// Finish if nothing to write.
+	if ( !mLayerOverrides.size() == 0 )
+		return;
+
+	// Add cell custom property.
+	TamlCustomProperty* pLayerProperty = customProperties.addProperty( layerCustomPropertyName );
+
+	// Iterate explicit frames.
+	for( auto itr = mLayerOverrides.begin(); itr != mLayerOverrides.end(); ++itr )
+	{
+		// Fetch pixel area.
+		auto overrideLayer = *itr;
+
+		// Add cell alias.
+		TamlPropertyAlias* pLayerAlias = pLayerProperty->addAlias( layerAliasName );
+
+		// Add cell properties.
+		pLayerAlias->addField( layerIdName, overrideLayer.LayerName );
+		pLayerAlias->addField( layerIndexName, overrideLayer.SceneLayer );
+	}
+
+}
+
 //----------------------------------------------------------------------------
 
 void TmxMapAsset::calculateMap()
@@ -228,7 +346,7 @@ StringTableEntry TmxMapAsset::getOrientation()
 	}
 }
 
-int TmxMapAsset::getLayerCount()
+S32 TmxMapAsset::getLayerCount()
 {
 	if (!isAssetValid()) return 0;
 
@@ -240,4 +358,45 @@ Tmx::Map* TmxMapAsset::getParser()
 	if (!isAssetValid()) return NULL;
 
 	return mParser;
+}
+
+S32 TmxMapAsset::getSceneLayer(const char* tmxLayerName)
+{
+	StringTableEntry layerName = StringTable->insert(tmxLayerName);
+
+	auto itr = mLayerOverrides.begin();
+	for(itr; itr != mLayerOverrides.end(); ++itr)
+	{
+		if ( (*itr).LayerName == layerName )
+			return (*itr).SceneLayer;
+	}
+
+	return 0;
+}
+
+void TmxMapAsset::setSceneLayer(const char*tmxLayerName, S32 layerIdx)
+{
+	StringTableEntry layerName = StringTable->insert(tmxLayerName);
+	auto itr = mLayerOverrides.begin();
+	for(itr; itr != mLayerOverrides.end(); ++itr)
+	{
+		if ( (*itr).LayerName == layerName )
+		{
+			Con::warnf("Layer %s is already defined with an index of %d", layerName, (*itr).SceneLayer);
+			return;
+		}
+	}
+
+	LayerOverride lo(layerName, layerIdx);
+	mLayerOverrides.push_back(lo);
+}
+
+StringTableEntry TmxMapAsset::getLayerOverrideName(int idx)
+{
+	if (idx >= mLayerOverrides.size())
+	{
+		Con::warnf("TmxMapAsset_getLayerOverrideName() - invalid idx %d", idx);
+		return StringTable->EmptyString;
+	}
+	return mLayerOverrides.at(idx).LayerName;
 }

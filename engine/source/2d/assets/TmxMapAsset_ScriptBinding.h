@@ -24,3 +24,27 @@ ConsoleMethod(TmxMapAsset, getLayerCount, S32, 2, 2,  "() Gets the number of til
 {
 	return object->getLayerCount();
 }
+
+ConsoleMethod(TmxMapAsset, getLayerOverrideCount, S32, 2, 2,  "() Gets the number of layer override entries.\n"
+	"@return Returns the number of layer override entries.")
+{
+	return object->getLayerOverrideCount();
+}
+
+ConsoleMethod(TmxMapAsset, getLayerOverrideName, const char*, 3, 3,  "(index) Gets the TMX layer name at (index).\n"
+	"@return Returns the TMX layer name at the specified index.")
+{
+	return object->getLayerOverrideName( dAtoi(argv[2]) );
+}
+
+ConsoleMethod(TmxMapAsset, getSceneLayer, S32, 3, 3,  "(TMX_layer_name) Gets the overridden scene render layer for (TMX_layer_name).\n"
+	"@return Returns  the overridden scene render layer defined for the given layer name.")
+{
+	return object->getSceneLayer( (argv[2]) );
+}
+
+ConsoleMethod(TmxMapAsset, setSceneLayer, void, 4, 4,  "(TMX_layer_name, scene_layer_number) Sets the overridden scene render layer for (TMX_layer_name).\n"
+	"")
+{
+	object->setSceneLayer( (argv[2]), dAtoi(argv[3]) );
+}

@@ -25,7 +25,7 @@ function TmxMapToy::destroy( %this )
 
 function TmxMapToy::reset( %this )
 {
-    // Clear the scene.
+    // Clear the scene.  
     SandboxScene.clear();
     
     %mapSprite = new TmxMapSprite()

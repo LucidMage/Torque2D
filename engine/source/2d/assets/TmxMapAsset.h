@@ -5,6 +5,10 @@
 #include "assets/assetPtr.h"
 #endif
 
+#ifndef _VECTOR_H_
+#include "collection/vector.h"
+#endif
+
 #include <Tmx.h>
 
 //-----------------------------------------------------------------------------
@@ -19,6 +23,19 @@ class TmxMapAsset : public AssetBase
 ////T2D SIM/CONSOLE setup////////////////////
 private:
 	typedef AssetBase Parent;
+
+public:
+	struct LayerOverride
+	{
+		StringTableEntry	LayerName;
+		S32					SceneLayer;
+
+	public: LayerOverride(StringTableEntry lName, S32 layerIdx)
+			{
+				LayerName = lName;
+				SceneLayer = layerIdx;
+			}
+	};
 
 public: 
 
@@ -40,6 +57,8 @@ private:
 	/// Configuration.
 	StringTableEntry            mMapFile;
 
+	Vector<LayerOverride>		mLayerOverrides;
+
 public:
 
 	void                    setMapFile( const char* pMapFile );
@@ -47,10 +66,14 @@ public:
 
 
 	StringTableEntry getOrientation();
-	int				 getLayerCount();
-
+	S32				 getLayerCount();
+	const Vector<LayerOverride>& getLayerOverrides(){return mLayerOverrides;}
 	Tmx::Map*		 getParser();
 
+	S32				getSceneLayer(const char* tmxLayerName);
+	void			setSceneLayer(const char*tmxLayerName, S32 layerIdx);
+	S32				getLayerOverrideCount(){return mLayerOverrides.size();}
+	StringTableEntry getLayerOverrideName(int idx);
 private:
 
 	Tmx::Map*					mParser;
@@ -65,6 +88,8 @@ protected:
 	/// Taml callbacks.
 	virtual void onTamlPreWrite( void );
 	virtual void onTamlPostWrite( void );
+	virtual void onTamlCustomWrite( TamlCustomProperties& customProperties );
+	virtual void onTamlCustomRead( const TamlCustomProperties& customProperties );
 
 
 protected:

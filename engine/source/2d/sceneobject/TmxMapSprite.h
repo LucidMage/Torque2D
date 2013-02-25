@@ -54,7 +54,7 @@ private:
 	void ClearMap();
 	Vector2 CoordToTile(Vector2& pos, Vector2& tileSize, bool isIso);
 	Vector2 TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offset, bool isIso);
-	CompositeSprite* CreateLayer(int layerIndex, bool isIso);
+	CompositeSprite* CreateLayer(void* layer, int layerIndex,  bool isTileLayer, bool isIso);
 	const char* getFileName(const char* path);
 	StringTableEntry GetTilesetAsset(const Tmx::Tileset* tileSet);
 

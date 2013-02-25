@@ -93,7 +93,7 @@ void TmxMapSprite::ClearMap()
 	for(layerIdx; layerIdx != mLayers.end(); ++layerIdx)
 	{
 		CompositeSprite* sprite = *layerIdx;
-		delete sprite;
+		sprite->deleteObject();
 	}
 	mLayers.clear();
 }
@@ -106,6 +106,8 @@ void TmxMapSprite::BuildMap()
 
 
 	ClearMap();
+
+	if (mMapAsset.isNull()) return;
 	auto mapParser = mMapAsset->getParser();
 
 	Tmx::MapOrientation orient = mapParser->GetOrientation();
@@ -141,10 +143,11 @@ void TmxMapSprite::BuildMap()
 		Tmx::Layer* layer = *layerItr;
 
 		//default to layer 0, unless a property is added to the layer that overrides it.
-		int layerNumber = 0;
-		layerNumber = layer->GetProperties().GetNumericProperty(TMX_MAP_LAYER_ID_PROP);
+		int layerNumber = -1;
+		if ( layer->GetProperties().HasProperty(TMX_MAP_LAYER_ID_PROP))
+			layerNumber = layer->GetProperties().GetNumericProperty(TMX_MAP_LAYER_ID_PROP);
 
-		auto compSprite = CreateLayer(layerNumber, orient == Tmx::TMX_MO_ISOMETRIC);
+		auto compSprite = CreateLayer(layer, layerNumber, true, orient == Tmx::TMX_MO_ISOMETRIC);
 
 		int xTiles = mapParser->GetWidth();
 		int yTiles = mapParser->GetHeight();
@@ -197,7 +200,7 @@ void TmxMapSprite::BuildMap()
 		//default to layer 0, unless a property is added to the layer that overrides it.
 		int layerNumber = 0;
 		layerNumber = groupLayer->GetProperties().GetNumericProperty(TMX_MAP_LAYER_ID_PROP);
-		auto compSprite = CreateLayer(layerNumber, orient == Tmx::TMX_MO_ISOMETRIC);
+		auto compSprite = CreateLayer(groupLayer, layerNumber, false, orient == Tmx::TMX_MO_ISOMETRIC);
 
 		auto objectIdx = groupLayer->GetObjects().begin();
 		for(objectIdx; objectIdx != groupLayer->GetObjects().end(); ++objectIdx)
@@ -296,9 +299,36 @@ Vector2 TmxMapSprite::TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offs
 	}
 }
 
-CompositeSprite* TmxMapSprite::CreateLayer(int layerIndex, bool isIso)
+CompositeSprite* TmxMapSprite::CreateLayer(void* tmxLayer, int layerIndex, bool isTileLayer, bool isIso)
 {
+	StringTableEntry layerName = StringTable->EmptyString;
+
+	Tmx::Layer* tileLayer = static_cast<Tmx::Layer*>(tmxLayer);
+	Tmx::ObjectGroup* groupLayer = static_cast<Tmx::ObjectGroup*>(tmxLayer);
+
+	//see if we have a layer override for this.
+	if (isTileLayer)
+		layerName = StringTable->insert( tileLayer->GetName().c_str());
+	else
+		layerName = StringTable->insert( groupLayer->GetName().c_str());
+	TmxMapAsset::LayerOverride layerOverride(layerName, 0);
+
+
+	auto overrideIdx = mMapAsset->getLayerOverrides().begin();
+	for(overrideIdx; overrideIdx != mMapAsset->getLayerOverrides().end(); ++overrideIdx)
+	{
+		auto chkOverride = *overrideIdx;
+
+		if (chkOverride.LayerName == layerOverride.LayerName)
+		{
+			layerOverride = chkOverride;
+			break;
+		}
+	}
+
+
 	CompositeSprite* compSprite = new CompositeSprite();
+	compSprite->registerObject();
 	mLayers.push_back(compSprite);
 
 	auto scene = this->getScene();
@@ -309,9 +339,14 @@ CompositeSprite* TmxMapSprite::CreateLayer(int layerIndex, bool isIso)
 	compSprite->setBatchLayout( CompositeSprite::NO_LAYOUT );
 	compSprite->setPosition(getPosition());
 	compSprite->setAngle(getAngle());
-	compSprite->setSceneLayer(layerIndex);
-	compSprite->setBatchSortMode(SceneRenderQueue::RENDER_SORT_ZAXIS);
-	compSprite->setBatchIsolated(true);
+
+	if (layerIndex == -1)
+		compSprite->setSceneLayer(layerOverride.SceneLayer);
+	else
+		compSprite->setSceneLayer(layerIndex);
+
+	compSprite->setBatchIsolated(false);
+	dynamic_cast<SpriteBatch*>(compSprite)->setBatchCulling( true );
 	return compSprite;
 }
 

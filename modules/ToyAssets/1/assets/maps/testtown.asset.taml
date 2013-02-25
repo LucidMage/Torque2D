@@ -1,4 +1,13 @@
 <TmxMapAsset
     AssetName="testtown_map"
     MapFile="testtown.tmx"
- />
+	>	
+
+	<TmxMapAsset.Layers>
+		<Layer Name="Floor" Layer="15"></Layer>
+		<Layer Name="Fringe" Layer="14"></Layer>
+		<Layer Name="Over" Layer="13"></Layer>
+		<Layer Name="Hip roof" Layer="12"></Layer>
+	</TmxMapAsset.Layers>
+	
+</TmxMapAsset>

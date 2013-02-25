@@ -13,33 +13,21 @@
   <image source="../images/Woodland_x3.png" width="512" height="192"/>
  </tileset>
  <layer name="Floor" width="40" height="40">
-  <properties>
-   <property name="LayerId" value="30"/>
-  </properties>
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC+3XYQrDIAwFYO86eoWx2+wIHsUeaQwMPNLoYlGTQX48pM7pN1e1LSmlEolEIjVviLXF2nc693mfv/DNy6kM+jTtdxtHfbOM2r5++Ub6muXrzR//fIcPyweE+3hb6fur7r3WOB58WJfZeJLvgLLU8oDrVXNIPpwLq/lr3eeZ1Us+vldT3QpfZgZ+Le0v0lpecb6Qj9Jy8f1Fslj5NG6eVT6y3DHh75m5NjRtteNmZbs7Ps3c4B6EsfTR2swOfHTuanx0Xuzyfft91uAaafleNdb/b05XX+t5dKavdMbrPQ/31r3n96jw/a9v9F3Kq88q4fPh+wDfqKfXABkAAA==
   </data>
  </layer>
  <layer name="Fringe" width="40" height="40">
-  <properties>
-   <property name="LayerId" value="29"/>
-  </properties>
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC+1YO04DMRD1Qg8BeghwBMQVEBInQJRRJIQQJeIAqSkiGq5AHW3LWbgIwY78wtvZGa+dTarkSaP1rn9vPh7b69wOO2wP9irn9qsNT+LHr6r2uzq3aHvsyyeVMkYPyHkHvnykvC/ndu26X1+ee7nw5cuqPUYfSJ2HXs5pbLxjbgbqDrwcKn162TH2bems+dOYB21OvZwpffvYUfaFzpo/rXnQxuo77GFDyweaP6XPAelzrW9Dt1yu1A79n335JUMYXW2nQjcZQxZYJ/SfZahViol4l3FgAe14DYBfyo5TMU6OzUMfmcOseFmAbMtrAPxSdqzdv00mHW25T0neZttyHM+MOS/EXAxu+5bgZ+UwDda6ZfuNvPzEZ+D3meAHXmMS5rboI3J/Tl6UujC/V5JrKmv8xgkBPzlXMv4iZI7X/Pvl5S4+YQ+N31DhFr59xz7ZdlPWhswvpesj+PcqPlnwrSZbdO3L6toQ/n1y/7nhUXx7bA63+B6+wcYfUWB36CTPPpYdG36PvNi/mwCv35L4A68++wfvD2z3d6NN1nnG0GGT9lvFbgG87wQ9c84EjK59DfxadsvJz07f31bBWCnX9JTrNjfPIG7nCr+RkC5+cv+oxTNAxrwF5o+7Q+DH/l4rv4L4C+DzFe4OgR/7O3C68XKbwXVMbTV+xfeQqI+MPz7PhP323suDa+7Hr8pwb9QW5wU1/jIBfVLx1xda/OXeP/hehfjj/LoOwV7I8Zd7/whAW8SfdtdN5S38M2iA6rX4Kzn/WXmQdUzlrcY/A6U+FX/Z8SjyoHXG1fLW8p+BVl8Z8VcIjYOmY5e+sn6wJn4lHFYdd4ftxR/yo5YWABkAAA==
   </data>
  </layer>
  <layer name="Over" width="40" height="40">
-  <properties>
-   <property name="LayerId" value="28"/>
-  </properties>
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC+2Yy0oDMRhGU6uICl42KqJ15UJF1J1IFVEfQwoi3Xt5CB+hT6cbL6Ao3kAFoXqCqRNCxgllJplCDj1k2obJP//M9GsrRCQSiZSXNn5nTarwqHgoxsIo645lrD3O+xOB6qux7nygtYumEbqAfzjGEzz1vG7DGH2vXcV+HMBB5RAO44hIeuK7N/r5mMJpnFHO4hzWMvbRVBbJIi7hMq4oV3EN1425eq+bhnrP80Ke3zpu4TbuKHdxD/eN+ZMi6bXkHZ9Ufa49d8V2v7WMUaLfH3qvTdJ6XiSdY9CPpdPrQzXnQI1pPQ9FK2U7JC6fgaEyxCUf8syQXszKC7z0X44TV3iNN3gbuBaTO7zHI+WjSLJYasuEorKtbXntGV/wFd/wQSRZLM0rE7rlAz+1518iyWKpz0yopnx3P9O2N3ATF8RvHkvqKfs7z6muXsF2/fUMAX/X6vSVoIZuKEPv/si5llIdm4VQ/3dEIq78ALQQ3MMAGQAA
   </data>
  </layer>
  <layer name="Hip roof" width="40" height="40">
-  <properties>
-   <property name="LayerId" value="27"/>
-  </properties>
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC+3VMQ6CQBRFUdwBFQvS/S8BG8QERaOAkUQLr4UJhswUDvJH805yCwoyv3tJIiIiQRbWB/ilkd8n88hpbX2EQ0EbKmn7xXeyD/6paEd7qulAxymPCnSiMzXUUkcX04veXakffN/obnSLiPwfbdvYa6+eXHsVy7a59iqGbfPtVSzbtqSVwbsiIiK/5gGU5C+iABkAAA==
   </data>
