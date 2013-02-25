@@ -20,48 +20,32 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TAML_BINARYREADER_H_
-#define _TAML_BINARYREADER_H_
+$iOS::constant::iPhone = 0;
+$iOS::constant::iPad = 1;
+$iOS::constant::iPhone5 = 2;
 
-#ifndef _HASHTABLE_H
-#include "collection/hashTable.h"
-#endif
+$iOS::constant::Landscape = 0;
+$iOS::constant::Portrait = 1;
+$iOS::constant::ResolutionFull = 0;
+$iOS::constant::ResolutionSmall = 1;
 
-#ifndef _TAML_H_
-#include "persistence/taml/taml.h"
-#endif
+$iOS::constant::iPhoneWidth = 480;
+$iOS::constant::iPhoneHeight = 320;
 
-//-----------------------------------------------------------------------------
+$iOS::constant::iPhone4Width = 960;
+$iOS::constant::iPhone4Height = 640;
 
-class TamlBinaryReader
-{
-public:
-    TamlBinaryReader( Taml* pTaml ) :
-        mpTaml( pTaml )
-    {
-    }
+$iOS::constant::iPadWidth = 1024;
+$iOS::constant::iPadHeight = 768;
 
-    virtual ~TamlBinaryReader() {}
+$iOS::constant::NewiPadWidth = 2048;
+$iOS::constant::NewiPadHeight = 1536;
 
-    /// Read.
-    SimObject* read( FileStream& stream );
+$iOS::constant::iPhone5Width = 1136;
+$iOS::constant::iPhone5Height = 640;
 
-private:
-    Taml*               mpTaml;
-    StringTableEntry    mTamlObjectName;
-
-    typedef HashMap<SimObjectId, SimObject*> typeObjectReferenceHash;
-
-    typeObjectReferenceHash mObjectReferenceMap;
-
-private:
-    void resetParse( void );
-
-    SimObject* parseElement( Stream& stream, const U32 versionId );
-    void parseAttributes( Stream& stream, SimObject* pSimObject, const U32 versionId );
-    void parseChildren( Stream& stream, TamlCallbacks* pCallbacks, SimObject* pSimObject, const U32 versionId );
-    void parseCustomElements( Stream& stream, TamlCallbacks* pCallbacks, TamlCustomNodes& customNodes, const U32 versionId );
-    void parseCustomNode( Stream& stream, TamlCustomNode* pCustomNode, const U32 versionId );
-};
-
-#endif // _TAML_BINARYREADER_H_
+$iOS::constant::OrientationUnknown = 0;
+$iOS::constant::OrientationLandscapeLeft = 1;
+$iOS::constant::OrientationLandscapeRight = 2;
+$iOS::constant::OrientationPortrait = 3;
+$iOS::constant::OrientationPortraitUpsideDown = 4;

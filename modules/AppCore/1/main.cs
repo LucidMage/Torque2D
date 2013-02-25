@@ -20,48 +20,31 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TAML_BINARYREADER_H_
-#define _TAML_BINARYREADER_H_
-
-#ifndef _HASHTABLE_H
-#include "collection/hashTable.h"
-#endif
-
-#ifndef _TAML_H_
-#include "persistence/taml/taml.h"
-#endif
+function AppCore::create( %this )
+{
+    // Load system scripts
+    exec("./scripts/constants.cs");
+    exec("./scripts/defaultPreferences.cs");
+    exec("./scripts/canvas.cs");
+    exec("./scripts/openal.cs");
+    
+    // Initialize the canvas
+    initializeCanvas("Torque 2D");
+    
+    // Set the canvas color
+    Canvas.BackgroundColor = "CornflowerBlue";
+    Canvas.UseBackgroundColor = false;
+    
+    // Initialize audio
+    initializeOpenAL();
+    
+    ModuleDatabase.loadGroup("gameBase");
+}
 
 //-----------------------------------------------------------------------------
 
-class TamlBinaryReader
+function AppCore::destroy( %this )
 {
-public:
-    TamlBinaryReader( Taml* pTaml ) :
-        mpTaml( pTaml )
-    {
-    }
 
-    virtual ~TamlBinaryReader() {}
+}
 
-    /// Read.
-    SimObject* read( FileStream& stream );
-
-private:
-    Taml*               mpTaml;
-    StringTableEntry    mTamlObjectName;
-
-    typedef HashMap<SimObjectId, SimObject*> typeObjectReferenceHash;
-
-    typeObjectReferenceHash mObjectReferenceMap;
-
-private:
-    void resetParse( void );
-
-    SimObject* parseElement( Stream& stream, const U32 versionId );
-    void parseAttributes( Stream& stream, SimObject* pSimObject, const U32 versionId );
-    void parseChildren( Stream& stream, TamlCallbacks* pCallbacks, SimObject* pSimObject, const U32 versionId );
-    void parseCustomElements( Stream& stream, TamlCallbacks* pCallbacks, TamlCustomNodes& customNodes, const U32 versionId );
-    void parseCustomNode( Stream& stream, TamlCustomNode* pCustomNode, const U32 versionId );
-};
-
-#endif // _TAML_BINARYREADER_H_
