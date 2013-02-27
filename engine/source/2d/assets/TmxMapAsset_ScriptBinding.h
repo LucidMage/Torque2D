@@ -43,8 +43,8 @@ ConsoleMethod(TmxMapAsset, getSceneLayer, S32, 3, 3,  "(TMX_layer_name) Gets the
 	return object->getSceneLayer( (argv[2]) );
 }
 
-ConsoleMethod(TmxMapAsset, setSceneLayer, void, 4, 4,  "(TMX_layer_name, scene_layer_number) Sets the overridden scene render layer for (TMX_layer_name).\n"
+ConsoleMethod(TmxMapAsset, setSceneLayer, void, 6, 6,  "(TMX_layer_name, scene_layer_number, shouldRender, useObjects) Sets the overridden scene render layer for (TMX_layer_name).\n"
 	"")
 {
-	object->setSceneLayer( (argv[2]), dAtoi(argv[3]) );
+	object->setSceneLayer( (argv[2]), dAtoi(argv[3]), dAtob(argv[4]), dAtob(argv[5]) );
 }

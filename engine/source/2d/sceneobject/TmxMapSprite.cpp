@@ -54,6 +54,12 @@ void TmxMapSprite::OnRegisterScene(Scene* scene)
 		scene->addToScene(*layerIdx);
 	}
 
+	auto collisionidx = mCollisionTiles.begin();
+	for(collisionidx; collisionidx != mCollisionTiles.end(); ++collisionidx)
+	{
+		scene->addToScene(*collisionidx);
+	}
+
 }
 
 void TmxMapSprite::OnUnregisterScene( Scene* pScene )
@@ -65,15 +71,30 @@ void TmxMapSprite::OnUnregisterScene( Scene* pScene )
 	{
 		pScene->removeFromScene(*layerIdx);
 	}
+
+	auto collisionidx = mCollisionTiles.begin();
+	for(collisionidx; collisionidx != mCollisionTiles.end(); ++collisionidx)
+	{
+		pScene->removeFromScene(*collisionidx);
+	}
 }
 
 void TmxMapSprite::setPosition( const Vector2& position )
 {
+	auto posDiff = getPosition() - position;
+
 	Parent::setPosition(position);
 	auto layerIdx = mLayers.begin();
 	for(layerIdx; layerIdx != mLayers.end(); ++layerIdx)
 	{
 		(*layerIdx)->setPosition(position);
+	}
+
+	auto collisionidx = mCollisionTiles.begin();
+	for(collisionidx; collisionidx != mCollisionTiles.end(); ++collisionidx)
+	{
+		SceneObject* obj = *collisionidx;
+		obj->setPosition( obj->getPosition() + posDiff );
 	}
 }
 
@@ -84,6 +105,12 @@ void TmxMapSprite::setAngle( const F32 radians )
 	for(layerIdx; layerIdx != mLayers.end(); ++layerIdx)
 	{
 		(*layerIdx)->setAngle(radians);
+	}
+
+	auto collisionidx = mCollisionTiles.begin();
+	for(collisionidx; collisionidx != mCollisionTiles.end(); ++collisionidx)
+	{
+		(*collisionidx)->setAngle(radians);
 	}
 }
 
@@ -96,6 +123,14 @@ void TmxMapSprite::ClearMap()
 		sprite->deleteObject();
 	}
 	mLayers.clear();
+
+	auto collisionidx = mCollisionTiles.begin();
+	for(collisionidx; collisionidx != mCollisionTiles.end(); ++collisionidx)
+	{
+		auto collisonObject = *collisionidx;
+		collisonObject->deleteObject();
+	}
+	mCollisionTiles.clear();
 }
 
 
@@ -103,7 +138,6 @@ void TmxMapSprite::BuildMap()
 {
 	// Debug Profiling.
 	PROFILE_SCOPE(TmxMapSprite_BuildMap);
-
 
 	ClearMap();
 
@@ -147,7 +181,9 @@ void TmxMapSprite::BuildMap()
 		if ( layer->GetProperties().HasProperty(TMX_MAP_LAYER_ID_PROP))
 			layerNumber = layer->GetProperties().GetNumericProperty(TMX_MAP_LAYER_ID_PROP);
 
-		auto compSprite = CreateLayer(layer, layerNumber, true, orient == Tmx::TMX_MO_ISOMETRIC);
+		auto assetLayerData = getLayerAssetData(  StringTable->insert(layer->GetName().c_str()) );
+
+		auto compSprite = CreateLayer(assetLayerData, layerNumber, true, orient == Tmx::TMX_MO_ISOMETRIC);
 
 		int xTiles = mapParser->GetWidth();
 		int yTiles = mapParser->GetHeight();
@@ -179,14 +215,58 @@ void TmxMapSprite::BuildMap()
 				pos.add(Vector2(widthOffset, heightOffset));
 				pos *= mMapPixelToMeterFactor;
 
-				auto bId = compSprite->addSprite( SpriteBatchItem::LogicalPosition( pos.scriptThis()) );
-				compSprite->selectSpriteId(bId);
-				compSprite->setSpriteImage(assetName, localFrame);
-				compSprite->setSpriteSize( Vector2( spriteWidth * mMapPixelToMeterFactor, spriteHeight * mMapPixelToMeterFactor ) );
+				if (assetLayerData.mShouldRender)
+				{
+					auto bId = compSprite->addSprite( SpriteBatchItem::LogicalPosition( pos.scriptThis()) );
+					compSprite->setSpriteImage(assetName, localFrame);
+					compSprite->setSpriteSize( Vector2( spriteWidth * mMapPixelToMeterFactor, spriteHeight * mMapPixelToMeterFactor ) );
 
-				compSprite->setSpriteFlipX(tile.flippedHorizontally);
-				compSprite->setSpriteFlipY(tile.flippedVertically);
+					compSprite->setSpriteFlipX(tile.flippedHorizontally);
+					compSprite->setSpriteFlipY(tile.flippedVertically);
+				}
 
+				if (assetLayerData.mUseObjects)
+				{
+					//see if this tile has any defined objects.
+					StringTableEntry tagName = StringTable->EmptyString;
+					auto tileProps = tset->GetTile(tile.id);
+					if (tileProps && tileProps->GetProperties().HasProperty(TMX_MAP_TILE_TAG_PROP))
+					{
+						tagName = StringTable->insert(tset->GetTile(tile.id)->GetProperties().GetLiteralProperty(TMX_MAP_TILE_TAG_PROP).c_str());
+					}
+
+					Vector<SceneObject*> objects;
+
+					if (tagName != StringTable->EmptyString)
+					{
+						objects = mMapAsset->getTileObjectsByTag(tagName);
+					}
+					else
+					{
+						objects = mMapAsset->getTileObjects( tile.tilesetId + tile.id );
+					}
+
+					for(auto objItr = objects.begin(); objItr != objects.end(); ++objItr)
+					{
+						auto baseObject = *objItr;
+
+						SceneObject* newObj = new SceneObject();
+						baseObject->copyTo(newObj);
+
+						newObj->setAwake(false);
+						newObj->setSize( Vector2( spriteWidth * mMapPixelToMeterFactor, spriteHeight * mMapPixelToMeterFactor ) );
+
+						Vector2 objPos(pos + this->getPosition());
+						newObj->setPosition(objPos);
+						newObj->setSceneLayer( assetLayerData.mSceneLayer );
+						newObj->registerObject();
+						mCollisionTiles.push_back(newObj);
+
+						if (getScene() != NULL)
+							getScene()->addToScene( newObj );
+
+					}
+				}
 			}
 		}
 
@@ -200,7 +280,10 @@ void TmxMapSprite::BuildMap()
 		//default to layer 0, unless a property is added to the layer that overrides it.
 		int layerNumber = 0;
 		layerNumber = groupLayer->GetProperties().GetNumericProperty(TMX_MAP_LAYER_ID_PROP);
-		auto compSprite = CreateLayer(groupLayer, layerNumber, false, orient == Tmx::TMX_MO_ISOMETRIC);
+
+		auto assetLayerData = getLayerAssetData(  StringTable->insert(groupLayer->GetName().c_str()) );
+
+		auto compSprite = CreateLayer(assetLayerData, layerNumber, false, orient == Tmx::TMX_MO_ISOMETRIC);
 
 		auto objectIdx = groupLayer->GetObjects().begin();
 		for(objectIdx; objectIdx != groupLayer->GetObjects().end(); ++objectIdx)
@@ -250,7 +333,6 @@ void TmxMapSprite::BuildMap()
 			compSprite->setSpriteFlipX(false);
 			compSprite->setSpriteFlipY(false);
 
-
 		}
 	}
 }
@@ -299,33 +381,28 @@ Vector2 TmxMapSprite::TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offs
 	}
 }
 
-CompositeSprite* TmxMapSprite::CreateLayer(void* tmxLayer, int layerIndex, bool isTileLayer, bool isIso)
+TmxMapAsset::LayerOverride TmxMapSprite::getLayerAssetData(StringTableEntry layerName)
 {
-	StringTableEntry layerName = StringTable->EmptyString;
-
-	Tmx::Layer* tileLayer = static_cast<Tmx::Layer*>(tmxLayer);
-	Tmx::ObjectGroup* groupLayer = static_cast<Tmx::ObjectGroup*>(tmxLayer);
-
-	//see if we have a layer override for this.
-	if (isTileLayer)
-		layerName = StringTable->insert( tileLayer->GetName().c_str());
-	else
-		layerName = StringTable->insert( groupLayer->GetName().c_str());
-	TmxMapAsset::LayerOverride layerOverride(layerName, 0);
-
-
+	TmxMapAsset::LayerOverride layerOverride(layerName, 0, true, true);
 	auto overrideIdx = mMapAsset->getLayerOverrides().begin();
 	for(overrideIdx; overrideIdx != mMapAsset->getLayerOverrides().end(); ++overrideIdx)
 	{
 		auto chkOverride = *overrideIdx;
 
-		if (chkOverride.LayerName == layerOverride.LayerName)
+		if (chkOverride.mLayerName == layerOverride.mLayerName)
 		{
 			layerOverride = chkOverride;
 			break;
 		}
 	}
+	return layerOverride;
+}
 
+CompositeSprite* TmxMapSprite::CreateLayer(const TmxMapAsset::LayerOverride& layerOverride, int layerIndex, bool isTileLayer, bool isIso)
+{
+
+	if (!layerOverride.mShouldRender)
+		return NULL;
 
 	CompositeSprite* compSprite = new CompositeSprite();
 	compSprite->registerObject();
@@ -341,7 +418,7 @@ CompositeSprite* TmxMapSprite::CreateLayer(void* tmxLayer, int layerIndex, bool 
 	compSprite->setAngle(getAngle());
 
 	if (layerIndex == -1)
-		compSprite->setSceneLayer(layerOverride.SceneLayer);
+		compSprite->setSceneLayer(layerOverride.mSceneLayer);
 	else
 		compSprite->setSceneLayer(layerIndex);
 

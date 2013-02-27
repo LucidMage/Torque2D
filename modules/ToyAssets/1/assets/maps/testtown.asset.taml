@@ -4,10 +4,27 @@
 	>	
 
 	<TmxMapAsset.Layers>
-		<Layer Name="Floor" Layer="15"></Layer>
-		<Layer Name="Fringe" Layer="14"></Layer>
-		<Layer Name="Over" Layer="13"></Layer>
-		<Layer Name="Hip roof" Layer="12"></Layer>
+		<Layer Name="Floor" Layer="15" Render="true" useObjects="true" ></Layer>
+		<Layer Name="Fringe" Layer="14" Render="true" useObjects="true" ></Layer>
+		<Layer Name="Over" Layer="13" Render="true" useObjects="true"></Layer>
+		<Layer Name="Hip roof" Layer="12" Render="true" useObjects="true"></Layer>
 	</TmxMapAsset.Layers>
+		
+	<TmxMapAsset.Tiles>
+		<Tile Tag="TileCollision" >
+			<SceneObject TamlId="1" BodyType="Static">				
+				<SceneObject.CollisionShapes>
+					<Polygon>
+						<Point>-0.5 -0.5</Point>
+						<Point>0.5 -0.5</Point>
+						<Point>-0.5 0.5</Point>
+						<Point>0.5 0.5</Point>
+					</Polygon>
+				</SceneObject.CollisionShapes>
+			</SceneObject>
+		</Tile>
+	
+	</TmxMapAsset.Tiles>
+	
 	
 </TmxMapAsset>

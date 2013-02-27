@@ -12,6 +12,7 @@
 
 #define TMX_MAP_TILESET_ASSETNAME_PROP "AssetName"
 #define TMX_MAP_LAYER_ID_PROP "LayerId"
+#define TMX_MAP_TILE_TAG_PROP "Tag"
 
 class TmxMapSprite : public SceneObject
 {
@@ -46,6 +47,7 @@ private: //config
 private:
 
 	Vector<CompositeSprite*> mLayers;
+	Vector<SceneObject*>	mCollisionTiles;
 
 	StringTableEntry  mLastTileAsset;
 	StringTableEntry  mLastTileImage;
@@ -54,9 +56,10 @@ private:
 	void ClearMap();
 	Vector2 CoordToTile(Vector2& pos, Vector2& tileSize, bool isIso);
 	Vector2 TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offset, bool isIso);
-	CompositeSprite* CreateLayer(void* layer, int layerIndex,  bool isTileLayer, bool isIso);
+	CompositeSprite* CreateLayer(const TmxMapAsset::LayerOverride& layerOverride, int layerIndex,  bool isTileLayer, bool isIso);
 	const char* getFileName(const char* path);
 	StringTableEntry GetTilesetAsset(const Tmx::Tileset* tileSet);
+	TmxMapAsset::LayerOverride getLayerAssetData(StringTableEntry layerName);
 
 public:
 	inline bool setMap( const char* pMapAssetId ){ if (pMapAssetId == NULL) return false; mMapAsset = pMapAssetId; BuildMap(); return false;}

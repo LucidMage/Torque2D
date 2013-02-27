@@ -9,6 +9,10 @@
 #include "collection/vector.h"
 #endif
 
+#ifndef _SCENE_OBJECT_H
+#include "2d/sceneobject/SceneObject.h"
+#endif
+
 #include <Tmx.h>
 
 //-----------------------------------------------------------------------------
@@ -27,13 +31,17 @@ private:
 public:
 	struct LayerOverride
 	{
-		StringTableEntry	LayerName;
-		S32					SceneLayer;
+		StringTableEntry	mLayerName;
+		S32					mSceneLayer;
+		bool				mShouldRender;
+		bool				mUseObjects;
 
-	public: LayerOverride(StringTableEntry lName, S32 layerIdx)
+	public: LayerOverride(StringTableEntry lName, S32 layerIdx, bool render, bool objects)
 			{
-				LayerName = lName;
-				SceneLayer = layerIdx;
+				mLayerName = lName;
+				mSceneLayer = layerIdx;
+				mShouldRender =render;
+				mUseObjects = objects;
 			}
 	};
 
@@ -58,6 +66,8 @@ private:
 	StringTableEntry            mMapFile;
 
 	Vector<LayerOverride>		mLayerOverrides;
+	HashTable<S32, Vector<SceneObject*>> mTileObjects;
+	HashTable<StringTableEntry, Vector<SceneObject*>> mTileObjectsByTag;
 
 public:
 
@@ -71,9 +81,12 @@ public:
 	Tmx::Map*		 getParser();
 
 	S32				getSceneLayer(const char* tmxLayerName);
-	void			setSceneLayer(const char*tmxLayerName, S32 layerIdx);
+	void			setSceneLayer(const char*tmxLayerName, S32 layerIdx, bool shouldRender, bool useObjects);
 	S32				getLayerOverrideCount(){return mLayerOverrides.size();}
 	StringTableEntry getLayerOverrideName(int idx);
+
+	Vector<SceneObject*> getTileObjects(S32 gId);
+	Vector<SceneObject*> getTileObjectsByTag(StringTableEntry tag);
 private:
 
 	Tmx::Map*					mParser;
@@ -88,8 +101,8 @@ protected:
 	/// Taml callbacks.
 	virtual void onTamlPreWrite( void );
 	virtual void onTamlPostWrite( void );
-	virtual void onTamlCustomWrite( TamlCustomProperties& customProperties );
-	virtual void onTamlCustomRead( const TamlCustomProperties& customProperties );
+	virtual void onTamlCustomWrite( TamlCustomNodes& customNodes );
+	virtual void onTamlCustomRead( const TamlCustomNodes& customNodes );
 
 
 protected:
