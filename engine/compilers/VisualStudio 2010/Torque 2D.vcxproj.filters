@@ -1277,7 +1277,7 @@
     </ClCompile>
     <ClCompile Include="..\..\source\2d\sceneobject\TmxMapSprite.cpp">
       <Filter>2d\sceneobject</Filter>
-    </ClCompile>    
+    </ClCompile>
     <ClCompile Include="..\..\source\2d\controllers\SceneController.cc">
       <Filter>2d\controllers</Filter>
     </ClCompile>
@@ -2624,7 +2624,7 @@
     </ClInclude>
     <ClInclude Include="..\..\source\2d\sceneobject\TmxMapSprite.h">
       <Filter>2d\sceneobject</Filter>
-    </ClInclude>    
+    </ClInclude>
     <ClInclude Include="..\..\source\2d\controllers\SceneController.h">
       <Filter>2d\controllers</Filter>
     </ClInclude>
@@ -2657,6 +2657,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\2d\controllers\PointForceController_ScriptBinding.h">
       <Filter>2d\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\2d\sceneobject\TmxMapSprite_ScriptBinding.h">
+      <Filter>2d\sceneobject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

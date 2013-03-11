@@ -32,6 +32,16 @@ public:
 	virtual void            setPosition( const Vector2& position );
 	virtual void			setAngle( const F32 radians );
 
+	inline void setLocalExtentsDirty( void ) { mLocalExtentsDirty = true; }
+	inline bool getLocalExtentsDirty( void ) const { return mLocalExtentsDirty; }
+	inline const Vector2& getLocalExtents( void ) { if ( getLocalExtentsDirty() ) updateLocalExtents(); return mLocalExtents; }
+
+	StringTableEntry getTileProperty(StringTableEntry layerName, StringTableEntry propName, int x, int y);
+	Vector2 CoordToTile(Vector2& pos, Vector2& tileSize, bool isIso);
+	Vector2 TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offset, bool isIso);
+	Vector2 getTileSize(){return mTileSize;}
+	bool	isIsoMap(){return mbIsIsoMap;}
+
 	/// Declare Console Object.
 	DECLARE_CONOBJECT( TmxMapSprite );
 
@@ -44,18 +54,21 @@ private: //config
 													//The default is to set every pixel equal to 0.03 meters (or about 33 pixels per meter)
 													//This should match up with the rest of your asset design resolution.
 
+
+	Vector2                         mLocalExtents;
+	bool                            mLocalExtentsDirty;
+
 private:
 
 	Vector<CompositeSprite*> mLayers;
 	Vector<SceneObject*>	mCollisionTiles;
-
+	Vector2			  mTileSize;
+	bool			  mbIsIsoMap;
 	StringTableEntry  mLastTileAsset;
 	StringTableEntry  mLastTileImage;
 
 	void BuildMap();
 	void ClearMap();
-	Vector2 CoordToTile(Vector2& pos, Vector2& tileSize, bool isIso);
-	Vector2 TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offset, bool isIso);
 	CompositeSprite* CreateLayer(const TmxMapAsset::LayerOverride& layerOverride, int layerIndex,  bool isTileLayer, bool isIso);
 	const char* getFileName(const char* path);
 	StringTableEntry GetTilesetAsset(const Tmx::Tileset* tileSet);
@@ -67,6 +80,8 @@ public:
 	inline bool setMapToMeterFactor( F32 factor ) {mMapPixelToMeterFactor = factor; BuildMap(); return false;}
 	inline F32 getMapToMeterFactor( void ) const {return mMapPixelToMeterFactor;}
 
+
+
 protected:
 	static bool setMap(void* obj, const char* data)                       { return static_cast<TmxMapSprite*>(obj)->setMap(data);}
 	static const char* getMap(void* obj, const char* data)                { return static_cast<TmxMapSprite*>(obj)->getMap(); }
@@ -76,6 +91,7 @@ protected:
 	static StringTableEntry getMapToMeterFactor(void* obj, const char* data)	{return Con::getFloatArg( static_cast<TmxMapSprite*>(obj)->getMapToMeterFactor() );}
 	static bool writeMapToMeterFactor(void* obj, StringTableEntry pFieldName)	{return static_cast<TmxMapSprite*>(obj)->mMapPixelToMeterFactor != 0.1f;}
 
+	void updateLocalExtents( void );
 
 };
 

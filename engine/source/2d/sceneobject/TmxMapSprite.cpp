@@ -1,6 +1,8 @@
-#include "TmxMapSprite.h"
-
 #include "assets/assetManager.h"
+#include "console/console.h"
+
+#include "2d/sceneobject/TmxMapSprite.h"
+#include "2d/sceneobject/TmxMapSprite_ScriptBinding.h"
 
 //-----------------------------------------------------------------------------
 
@@ -8,10 +10,17 @@ IMPLEMENT_CONOBJECT(TmxMapSprite);
 
 //------------------------------------------------------------------------------
 
-TmxMapSprite::TmxMapSprite() : mMapPixelToMeterFactor(0.03),
+TmxMapSprite::TmxMapSprite() : mMapPixelToMeterFactor(0.03f),
 	mLastTileAsset(StringTable->EmptyString),
 	mLastTileImage(StringTable->EmptyString)
 {
+	// Reset local extents.
+	mLocalExtents.SetZero();
+	mLocalExtentsDirty = true;
+
+	mTileSize.SetZero();
+	mbIsIsoMap = false;
+
 	mAutoSizing = true;
 	setSleepingAllowed(true);
 	setBodyType(b2_staticBody);
@@ -60,6 +69,8 @@ void TmxMapSprite::OnRegisterScene(Scene* scene)
 		scene->addToScene(*collisionidx);
 	}
 
+	setLocalExtentsDirty();
+	updateLocalExtents();
 }
 
 void TmxMapSprite::OnUnregisterScene( Scene* pScene )
@@ -77,6 +88,9 @@ void TmxMapSprite::OnUnregisterScene( Scene* pScene )
 	{
 		pScene->removeFromScene(*collisionidx);
 	}
+	
+	setLocalExtentsDirty();
+
 }
 
 void TmxMapSprite::setPosition( const Vector2& position )
@@ -96,6 +110,10 @@ void TmxMapSprite::setPosition( const Vector2& position )
 		SceneObject* obj = *collisionidx;
 		obj->setPosition( obj->getPosition() + posDiff );
 	}
+
+	setLocalExtentsDirty();
+	updateLocalExtents();
+
 }
 
 void TmxMapSprite::setAngle( const F32 radians )
@@ -112,7 +130,53 @@ void TmxMapSprite::setAngle( const F32 radians )
 	{
 		(*collisionidx)->setAngle(radians);
 	}
+
+	setLocalExtentsDirty();
+	updateLocalExtents();
+
 }
+
+//------------------------------------------------------------------------------
+
+void TmxMapSprite::updateLocalExtents( void )
+{
+	// Debug Profiling.
+	PROFILE_SCOPE(TmxMapSprite_UpdateLocalExtents);
+
+	// Finish if the local extents are not dirty.
+	if ( !mLocalExtentsDirty )
+		return;
+
+	// Flag as NOT dirty.
+	mLocalExtentsDirty = false;
+
+	// Do we have any sprites?
+	if ( mLayers.size() == 0 )
+	{
+		// No, so reset local extents.
+		mLocalExtents.setOne();
+
+		return;
+	}
+
+	// Fetch first layer.
+	auto layerItr = mLayers.begin();
+	auto compSprite = *layerItr;
+
+	Vector2 newExtent(0,0);
+
+	// Combine with the rest of the sprites.
+	for( ; layerItr != mLayers.end(); ++layerItr )
+	{
+		auto spSize = compSprite->getLocalExtents();
+		newExtent.x = getMax(newExtent.x, spSize.x);
+		newExtent.y = getMax(newExtent.y, spSize.y);
+	}
+
+	mLocalExtents = newExtent;
+	setSize(mLocalExtents);
+}
+
 
 void TmxMapSprite::ClearMap()
 {
@@ -131,6 +195,9 @@ void TmxMapSprite::ClearMap()
 		collisonObject->deleteObject();
 	}
 	mCollisionTiles.clear();
+
+	mTileSize.setZero();
+	mbIsIsoMap = false;
 }
 
 
@@ -146,22 +213,25 @@ void TmxMapSprite::BuildMap()
 
 	Tmx::MapOrientation orient = mapParser->GetOrientation();
 
-	F32 tileWidth = mapParser->GetTileWidth();
-	F32 tileHeight =mapParser->GetTileHeight();
-	F32 halfTileHeight = tileHeight * 0.5;
+	F32 tileWidth =  static_cast<F32>( mapParser->GetTileWidth() );
+	F32 tileHeight = static_cast<F32>( mapParser->GetTileHeight() );
+	F32 halfTileHeight = tileHeight * 0.5f;
 
 	F32 width = (mapParser->GetWidth() * tileWidth);
 	F32 height = (mapParser->GetHeight() * tileHeight);
 
+	mTileSize.Set(tileWidth, tileHeight);
 	F32 originY = 0;
 	F32 originX = 0;
 
 	if (orient == Tmx::TMX_MO_ISOMETRIC)
 	{
+		mbIsIsoMap = true;
 		originY = height / 2 - halfTileHeight;
 	}
 	else
 	{
+		mbIsIsoMap = false;
 		originX = -width/2;
 		originY = height/2; 
 	}
@@ -201,13 +271,13 @@ void TmxMapSprite::BuildMap()
 
 
 				int localFrame = tile.id;
-				F32 spriteHeight = tset->GetTileHeight();
-				F32 spriteWidth = tset->GetTileWidth();
+				F32 spriteHeight = static_cast<F32>( tset->GetTileHeight() );
+				F32 spriteWidth = static_cast<F32>( tset->GetTileWidth() );
 
-				F32 heightOffset = (spriteHeight - tileHeight) / 2;
-				F32 widthOffset = (spriteWidth - tileWidth) / 2;
+				F32 heightOffset = (spriteHeight - tileHeight) / 2.0f;
+				F32 widthOffset = (spriteWidth - tileWidth) / 2.0f;
 
-				Vector2 pos = TileToCoord( Vector2(x,y),
+				Vector2 pos = TileToCoord( Vector2( static_cast<F32>(x),static_cast<F32>(y) ),
 					tileSize,
 					originSize,
 					orient == Tmx::TMX_MO_ISOMETRIC
@@ -298,13 +368,13 @@ void TmxMapSprite::BuildMap()
 			StringTableEntry assetName = GetTilesetAsset(tileSet);
 			if (assetName == StringTable->EmptyString) continue;
 
-			F32 objectWidth = tileSet->GetTileWidth();
-			F32 objectHeight = tileSet->GetTileHeight();
+			F32 objectWidth = static_cast<F32>( tileSet->GetTileWidth() );
+			F32 objectHeight = static_cast<F32>( tileSet->GetTileHeight() );
 
 			F32 heightOffset =(objectHeight - tileHeight) / 2;
 			F32 widthOffset = (objectWidth - tileWidth) / 2;
 
-			Vector2 vTile = CoordToTile( Vector2(object->GetX(), object->GetY()),
+			Vector2 vTile = CoordToTile( Vector2(static_cast<F32>( object->GetX() ), static_cast<F32>( object->GetY() ) ),
 				tileSize,
 				orient == Tmx::TMX_MO_ISOMETRIC
 				);
@@ -335,6 +405,9 @@ void TmxMapSprite::BuildMap()
 
 		}
 	}
+
+	setLocalExtentsDirty();
+
 }
 
 Vector2 TmxMapSprite::CoordToTile(Vector2& pos, Vector2& tileSize, bool isIso)
@@ -365,7 +438,7 @@ Vector2 TmxMapSprite::TileToCoord(Vector2& pos, Vector2& tileSize, Vector2& offs
 	{
 		Vector2 newPos(
 			(pos.x - pos.y) * tileSize.y,
-			offset.y - (pos.x + pos.y) * tileSize.y * 0.5
+			offset.y - (pos.x + pos.y) * tileSize.y * 0.5f
 			);
 
 		return newPos;
@@ -479,4 +552,35 @@ StringTableEntry TmxMapSprite::GetTilesetAsset(const Tmx::Tileset* tileSet)
 	}
 	
 	return assetName;
+}
+
+StringTableEntry TmxMapSprite::getTileProperty(StringTableEntry layerName, StringTableEntry propName, int x, int y)
+{
+	if (mMapAsset.isNull()) StringTable->EmptyString;;
+	auto mapParser = mMapAsset->getParser();
+
+	auto layerItr = mapParser->GetLayers().begin();
+	for(layerItr; layerItr != mapParser->GetLayers().end(); ++layerItr)
+	{
+		Tmx::Layer* layer = *layerItr;
+
+		auto tmxLayerName = StringTable->insert(layer->GetName().c_str());
+
+		if (tmxLayerName == layerName)
+		{
+			auto tile = layer->GetTile(x, y);
+			if (tile.tilesetId != -1)
+			{
+				auto tset = mapParser->GetTileset(tile.tilesetId);
+				auto tileProps = tset->GetTile(tile.id);
+				if (tileProps && tileProps->GetProperties().HasProperty(propName) )
+				{
+					auto rStr = StringTable->insert(tileProps->GetProperties().GetLiteralProperty(propName).c_str());
+					return rStr;
+				}
+			}
+		}
+	}
+
+	return StringTable->EmptyString;
 }
