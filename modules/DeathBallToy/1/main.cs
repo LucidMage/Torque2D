@@ -38,7 +38,7 @@ function DeathBallToy::create( %this )
     DeathBallToy.WorldLeft = -50;
     DeathBallToy.WorldRight = 140;
 
-    DeathBallToy.rotateTime = 0;
+    DeathBallToy.rotateSpeed = 360;
     DeathBallToy.maxBallSpeed = 10;
     DeathBallToy.ballSpeed = 5;
     DeathBallToy.soldierSpeed = 1;
@@ -210,7 +210,7 @@ function DeathBallToy::spawnDeathball(%this, %position)
     
     //%db.pauseAnimation(1);
 
-    //Deathball.rollSchedule = Deathball.schedule(100, "updateRollAnimation");
+    Deathball.rollSchedule = Deathball.schedule(100, "updateRollAnimation");
 
     SandboxScene.add(%db);
 
@@ -224,13 +224,10 @@ function Deathball::updateRollAnimation(%this)
     %this.rollSchedule = "";
 
     %velocity = %this.getLinearVelocity();
-
-    %currentAnimTime = %this.getAnimationTime();
     %scaledVelocity = (mAbs(getWord(%velocity, 0))) + mAbs(getWord(%velocity, 1)) / 50;
     %flooredVelocity = mFloatLength(%scaledVelocity, 1);
-    %scaledAnimTime = %currentAnimTime * %flooredVelocity;
 
-    %this.setAnimationTimeScale(%scaledAnimTime);
+    %this.setAnimationTimeScale(%flooredVelocity / 15);
 
     %this.rollSchedule = %this.schedule(100, updateRollAnimation);
 }
@@ -461,10 +458,13 @@ package DeathBallToyPackage
 
 function SandboxWindow::onTouchDown(%this, %touchID, %worldPosition)
 {
+    // Call parent.
+    Parent::onTouchDown(%this, %touchID, %worldPosition );
+    
     %origin = Deathball.getPosition();
     %angle = -mRadToDeg( mAtan( getWord(%worldPosition,0)-getWord(%origin,0), getWord(%worldPosition,1)-getWord(%origin,1) ) );
 
-    Deathball.RotateTo( %angle, DeathBallToy.rotateTime );
+    Deathball.RotateTo( %angle, DeathBallToy.rotateSpeed );
 
     %adjustedSpeed = DeathBallToy.ballSpeed / DeathBallToy.maxBallSpeed;
 
@@ -479,10 +479,13 @@ function SandboxWindow::onTouchDown(%this, %touchID, %worldPosition)
 
 function SandboxWindow::onTouchUp(%this, %touchID, %worldPosition)
 {
+    // Call parent.
+    Parent::onTouchUp(%this, %touchID, %worldPosition );
+    
     %origin = Deathball.getPosition();
     %angle = -mRadToDeg( mAtan( getWord(%worldPosition,0)-getWord(%origin,0), getWord(%worldPosition,1)-getWord(%origin,1) ) );
 
-    Deathball.RotateTo( %angle, DeathBallToy.rotateTime );
+    Deathball.RotateTo( %angle, DeathBallToy.rotateSpeed );
 
     %adjustedSpeed = (DeathBallToy.ballSpeed / DeathBallToy.maxBallSpeed) * 3000;
 
@@ -493,10 +496,13 @@ function SandboxWindow::onTouchUp(%this, %touchID, %worldPosition)
 
 function SandboxWindow::onTouchDragged(%this, %touchID, %worldPosition)
 {
+    // Call parent.
+    Parent::onTouchDragged(%this, %touchID, %worldPosition );
+    
     %origin = Deathball.getPosition();
     %angle = -mRadToDeg( mAtan( getWord(%worldPosition,0)-getWord(%origin,0), getWord(%worldPosition,1)-getWord(%origin,1) ) );
 
-    Deathball.RotateTo( %angle, DeathBallToy.rotateTime );
+    Deathball.RotateTo( %angle, DeathBallToy.rotateSpeed );
 
     %adjustedSpeed = DeathBallToy.ballSpeed / DeathBallToy.maxBallSpeed;
 

@@ -25,8 +25,6 @@ function TruckToy::create( %this )
     // Activate the package.
     activatePackage( TruckToyPackage );
 
-    TruckToy.createProjectileScheduleId = "";
-    
     TruckToy.ObstacleFriction = 1.5;
     TruckToy.CameraWidth = 20;
     TruckToy.CameraHeight = 15;
@@ -50,15 +48,18 @@ function TruckToy::create( %this )
     TruckToy.ProjectileRate = 3000;
     TruckToy.ExplosionScale = 1;
     
+    TruckToy.RotateCamera = true;
+    
     // Add the custom controls.
     addNumericOption( "Wheel Speed", 100, 1000, 50, "setWheelSpeed", TruckToy.WheelSpeed, false, "Sets the rotational speed of the wheel when it is put into drive." );
     addNumericOption( "Wheel Friction", 0, 10, 1, "setWheelFriction", TruckToy.WheelFriction, true, "Sets the friction for the surface of each wheel." );
     addNumericOption( "Front Wheel Density", 1, 20, 1, "setFrontWheelDensity", TruckToy.FrontWheelDensity, true, "Sets the density of the front wheel." );
     addNumericOption( "Rear Wheel Density", 1, 20, 1, "setFrontWheelDensity", TruckToy.RearWheelDensity, true, "Sets the density of the rear wheel." );
-    addFlagOption("Front Wheel Drive", "setFrontWheelDrive", TruckToy.FrontWheelDrive, false, "Whether the motor on the front wheel is active or not." );
-    addFlagOption("Rear Wheel Drive", "setRearWheelDrive", TruckToy.RearWheelDrive, false, "Whether the motor on the rear wheel is active or not." );
     addNumericOption( "Projectile Rate (ms)", 100, 60000, 100, "setProjectileRate", TruckToy.ProjectileRate, false, "Sets the time interval in-between projectiles appearing." );
     addNumericOption( "Explosion Scale", 1, 11, 1, "setExplosionScale", TruckToy.ExplosionScale, false, "Sets the size scale of the explosions caused by a projectile landing." );
+    addFlagOption("Front Wheel Drive", "setFrontWheelDrive", TruckToy.FrontWheelDrive, false, "Whether the motor on the front wheel is active or not." );
+    addFlagOption("Rear Wheel Drive", "setRearWheelDrive", TruckToy.RearWheelDrive, false, "Whether the motor on the rear wheel is active or not." );
+    addFlagOption("Rotate Camera", "setRotateCamera", TruckToy.RotateCamera, true, "Whether the rotate the camera that is mounted to the truck or not." );
     
     // Reset the toy.
     %this.reset();
@@ -68,33 +69,14 @@ function TruckToy::create( %this )
 
 function TruckToy::destroy( %this )
 {
-    // Cancel any pending events.
-    TruckToy.cancelPendingEvents();
-        
     // Deactivate the package.
     deactivatePackage( TruckToyPackage );
 }
 
 //-----------------------------------------------------------------------------
 
-function TruckToy::cancelPendingEvents(%this)
-{
-    // Finish if there are not pending events.
-    if ( !isEventPending(%this.createProjectileScheduleId) )
-        return;
-        
-    // Cancel it.
-    cancel(%this.createProjectileScheduleId);
-    %this.createProjectileScheduleId = "";
-}
-
-//-----------------------------------------------------------------------------
-
 function TruckToy::reset( %this )
 {   
-    // Cancel any pending events.
-    %this.cancelPendingEvents();
-    
     // Clear the scene.
     SandboxScene.clear();    
     
@@ -103,6 +85,7 @@ function TruckToy::reset( %this )
 
     // Camera Configuration
     SandboxWindow.setCameraPosition( TruckToy.WorldLeft + (TruckToy.CameraWidth/2) - 10, 0 );
+    SandboxWindow.setCameraAngle( 0 );
     SandboxWindow.setCameraSize( TruckToy.CameraWidth, TruckToy.CameraHeight );
     SandboxWindow.setViewLimitOn( TruckToy.WorldLeft, TruckToy.CameraHeight/-2, TruckToy.WorldRight, TruckToy.CameraHeight/2 );
 
@@ -194,8 +177,8 @@ function TruckToy::reset( %this )
     %truckStartY = 3;   
     %this.createTruck( %truckStartX, %truckStartY );    
     
-    // Schedule to create a projectile.
-    TruckToy.createProjectileScheduleId = %this.schedule( TruckToy.ProjectileRate, "createProjectile" );    
+    // Start the timer.
+    TruckToy.startTimer( "createProjectile", TruckToy.ProjectileRate );
 }
 
 // -----------------------------------------------------------------------------
@@ -206,7 +189,7 @@ function TruckToy::createBackground(%this)
     %obj = new Sprite();
     %obj.setBodyType( "static" );
     %obj.setImage( "ToyAssets:highlightBackground" );
-    //%obj.setImage( "TruckToy:background_day" );
+    %obj.BlendColor = DarkGray;
     %obj.setSize( TruckToy.WorldWidth * (TruckToy.CameraWidth*2), 75 );
     %obj.setSceneLayer( TruckToy.BackdropDomain );
     %obj.setSceneGroup( TruckToy.BackdropDomain );
@@ -665,15 +648,11 @@ function TruckToy::createBonfire(%this, %x, %y, %scale, %layer)
 
 function TruckToy::createProjectile(%this)
 {
-    // Reset the event schedule.
-    %this.createProjectileScheduleId = "";
-    
     // Fetch the truck position.
-    %truckPositionX = TruckToy.TruckBody.getPositionX();
+    %truckPositionX = TruckToy.TruckBody.Position.x;
     
     %projectile = new Sprite() { class = "TruckProjectile"; };
     %projectile.Animation = "ToyAssets:Projectile_FireballAnim";
-    //%projectile.Image = "ToyAssets:Cannonball_projectile_1Sprite";
     %projectile.setPosition( getRandom( %truckPositionX - (TruckToy.CameraWidth * 0.2), %truckPositionX + (TruckToy.CameraWidth * 0.5) ), 12 );
     %projectile.setSceneLayer( TruckToy.BackgroundDomain-2 );
     %projectile.setSceneGroup( TruckToy.ProjectileDomain );
@@ -684,14 +663,11 @@ function TruckToy::createProjectile(%this)
     %projectile.setCollisionGroups( TruckToy.ObstacleDomain );
     %projectile.CollisionCallback = true;
     SandboxScene.add( %projectile ); 
-    
-    // Schedule to create a projectile.
-    %this.createProjectileScheduleId = %this.schedule( %this.ProjectileRate, "createProjectile" );         
 }
 
 // -----------------------------------------------------------------------------
 
-function TruckProjectile::handleCollision(%this, %object, %collisionDetails)
+function TruckProjectile::onCollision(%this, %object, %collisionDetails)
 {   
     // Create an impact explosion at the projectiles position.
     %particlePlayer = new ParticlePlayer();
@@ -744,10 +720,7 @@ function TruckToy::createTruck( %this, %posX, %posY )
 
 
     // Mount camera to truck body.
-    SandboxWindow.mount( TruckToy.TruckBody, "0 0", 3, true, true );
-
-    //SandboxScene.setDebugSceneObject( TruckToy.TruckBody );
-
+    SandboxWindow.mount( TruckToy.TruckBody, "0 0", 3, true, TruckToy.RotateCamera );
 
     // Tires.
     // Suspension = -1.0 : -1.5   
@@ -938,11 +911,8 @@ function TruckToy::setProjectileRate( %this, %value )
 {
     %this.ProjectileRate = %value;
     
-    // Cancel any pending events.
-    %this.cancelPendingEvents();
-    
-    // Schedule to create a projectile.
-    %this.createProjectileScheduleId = %this.schedule( 1000, "createProjectile" );    
+    // Start the timer.
+    TruckToy.startTimer( "createProjectile", TruckToy.ProjectileRate );
 }
 
 //-----------------------------------------------------------------------------
@@ -954,17 +924,27 @@ function TruckToy::setExplosionScale( %this, %value )
 
 //-----------------------------------------------------------------------------
 
+function TruckToy::setRotateCamera( %this, %value )
+{
+    %this.RotateCamera = %value;
+}
+
+//-----------------------------------------------------------------------------
+
 package TruckToyPackage
 {
 
 function SandboxWindow::onTouchDown(%this, %touchID, %worldPosition)
 {
+    // Call parent.
+    Parent::onTouchDown(%this, %touchID, %worldPosition );
+    
     // Finish if truck is already moving.
     if ( TruckToy.TruckMoving )
         return;
 
     // If we touch in-front of the truck then move forward else reverse.
-    if ( getWord(%worldPosition,0) >= TruckToy.TruckBody.getPositionX() )
+    if ( %worldPosition.x >= TruckToy.TruckBody.Position.x )
     {
         truckForward( true );
     }
@@ -978,6 +958,9 @@ function SandboxWindow::onTouchDown(%this, %touchID, %worldPosition)
 
 function SandboxWindow::onTouchUp(%this, %touchID, %worldPosition)
 {
+    // Call parent.
+    Parent::onTouchUp(%this, %touchID, %worldPosition );
+    
     // Stop the truck.
     TruckToy.truckStop();
 }
